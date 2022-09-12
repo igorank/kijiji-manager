@@ -15,11 +15,12 @@ class SingletonMeta(type):
 
 class Proxy(metaclass=SingletonMeta):
 
-    def __init__(self, username, password, host, port):
+    def __init__(self, username, password, host, port, url):
         self.username = username
         self.password = password
         self.host = host
         self.port = port
+        self.change_ip_url = url
 
     def get_username(self):
         return self.username
@@ -32,3 +33,6 @@ class Proxy(metaclass=SingletonMeta):
 
     def get_port(self):
         return self.port
+
+    def get_change_ip_url(self):
+        return self.change_ip_url

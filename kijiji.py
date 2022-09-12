@@ -1,5 +1,8 @@
 import random
 import string
+import time
+
+from driver import Driver
 from filemanager import FileManager
 from randomuserpass import RandomGenerator
 from selenium.webdriver.common.by import By
@@ -15,42 +18,48 @@ def random_upper_letter():
 
 class Kijiji:
 
-    def __init__(self, driver):
+    def __init__(self):
         super().__init__()
-        self.driver = driver
+        # self.driver = driver
         self.names = FileManager.get_filesdata('names\\names_eng.txt')
         self.surnames = FileManager.get_filesdata('names\\surnames_eng.txt')
 
-    def register(self, email, imap_pass) -> dict:
+    def register(self, driver, email, imap_pass) -> dict:
         data = dict()
         data['email'] = email
 
-        self.driver.get("https://www.kijiji.ca/t-user-registration.html")
+        driver.get("https://www.kijiji.ca/")
+        WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.XPATH, '//*[@id="MainContainer"]/div[1]/div/div[2]/div/header/div['
+                                                      '3]/div/div[3]/div/div/div/a[1]')))
+        driver.find_element(By.XPATH, '//*[@id="MainContainer"]/div[1]/div/div[2]/div/header/div[3]/div/div['
+                                      '3]/div/div/div/a[1]').click()
+        time.sleep(99999)
 
         name = random.choice(self.names)
-        WebDriverWait(self.driver, 20).until(
+        WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.XPATH, '//*[@id="profileName"]')))
-        self.driver.find_element(By.XPATH, '//*[@id="profileName"]').send_keys(
+        driver.find_element(By.XPATH, '//*[@id="profileName"]').send_keys(
             name)
 
-        self.driver.find_element(By.XPATH, '//*[@id="email"]').send_keys(
+        driver.find_element(By.XPATH, '//*[@id="email"]').send_keys(
             email)
 
         password = RandomGenerator.random_password(8) + random_upper_letter() + '_' + str(random.randint(10, 99))
         data['password'] = password
-        self.driver.find_element(By.XPATH, '//*[@id="password"]').send_keys(
+        driver.find_element(By.XPATH, '//*[@id="password"]').send_keys(
             password)
-        self.driver.find_element(By.XPATH, '//*[@id="passwordConfirmation"]').send_keys(
+        driver.find_element(By.XPATH, '//*[@id="passwordConfirmation"]').send_keys(
             password)
 
-        self.driver.find_element(By.XPATH, '//*[@id="mainPageContent"]/div/div/div/div/div/div/main/form/button').click()
+        driver.find_element(By.XPATH, '//*[@id="mainPageContent"]/div/div/div/div/div/div/main/form/button').click()
 
         # WebDriverWait(self.driver, 20).until(
         #     EC.presence_of_element_located((By.XPATH, '//*[@id="LocUpdate"]')))     # проверка регистрации
 
         mail_reader = EmailReader("mail.inbox.lv", email, imap_pass)
         verf_link = mail_reader.get_verf_link(120)
-        self.driver.get(str(verf_link))
+        driver.get(str(verf_link))
 
         return data
 
