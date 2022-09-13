@@ -1,7 +1,6 @@
 import random
 import string
 import time
-
 from driver import Driver
 from filemanager import FileManager
 from randomuserpass import RandomGenerator
@@ -16,17 +15,21 @@ def random_upper_letter():
     return ''.join(random.choices(string.ascii_uppercase))
 
 
-class Kijiji:
+class Kijiji(Driver):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, chrome_path):
+        super().__init__(chrome_p=chrome_path)
         # self.driver = driver
         self.names = FileManager.get_filesdata('names\\names_eng.txt')
         self.surnames = FileManager.get_filesdata('names\\surnames_eng.txt')
 
-    def register(self, driver, email, imap_pass) -> dict:
+    def register(self, proxy, email, imap_pass) -> dict:
         data = dict()
         data['email'] = email
+
+        print('Setting up the driver.', end=' ')
+        driver = self.setup_driver(proxy=proxy, undetected=True, twocaptcha_ext=False, headless=False)
+        print('Done.')
 
         driver.get("https://www.kijiji.ca/")
         WebDriverWait(driver, 20).until(
@@ -34,7 +37,6 @@ class Kijiji:
                                                       '3]/div/div[3]/div/div/div/a[1]')))
         driver.find_element(By.XPATH, '//*[@id="MainContainer"]/div[1]/div/div[2]/div/header/div[3]/div/div['
                                       '3]/div/div/div/a[1]').click()
-        time.sleep(99999)
 
         name = random.choice(self.names)
         WebDriverWait(driver, 20).until(
@@ -59,7 +61,8 @@ class Kijiji:
 
         mail_reader = EmailReader("mail.inbox.lv", email, imap_pass)
         verf_link = mail_reader.get_verf_link(120)
-        driver.get(str(verf_link))
+        print(verf_link)
+        driver.get(verf_link)
 
         return data
 

@@ -2,6 +2,13 @@ import time
 from imap_tools import MailBox
 
 
+def unescape(s):
+    s = s.replace("&lt;", "<")
+    s = s.replace("&gt;", ">")
+    s = s.replace("&amp;", "&")
+    return s
+
+
 class EmailReader:
 
     def __init__(self, server, email, password):
@@ -18,7 +25,8 @@ class EmailReader:
                     index = text.find("https://www.kijiji.ca/m-user-activation.html?token=")
                     start = text[index:]
                     link = start.partition('"')[0]
-                    return link
+                    flink = unescape(link)
+                    return flink
             time.sleep(1)
             it += 1
         return False

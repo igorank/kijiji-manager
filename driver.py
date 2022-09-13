@@ -1,7 +1,7 @@
 import random
-import undetected_chromedriver.v2 as uc
 from seleniumwire import webdriver
 from selenium.webdriver.chrome.options import Options
+import seleniumwire.undetected_chromedriver.v2 as uc
 from useragent import UserAgent
 
 
@@ -14,15 +14,15 @@ class Driver:
         self.useragents = UserAgent("useragents\\useragents_win.txt")
         self.useragent = None
 
-    def setup_driver(self, proxy=None, twocaptcha_ext=True, headless=True, undetected=False):
+    def setup_driver(self, proxy=None, headless=True, undetected=False, twocaptcha_ext=True):
         if undetected:
             chrome_options = uc.ChromeOptions()
         else:
             chrome_options = Options()
+            if twocaptcha_ext:
+                chrome_options.add_extension('extensions\\3.0.9_0.crx')
         # chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
         self.useragent = random.choice(self.useragents)
-        if twocaptcha_ext:
-            chrome_options.add_extension('extensions\\3.0.9_0.crx')
         chrome_options.add_argument(f'--user-agent="{self.useragent}"')
         # chrome_options.add_argument(f'--user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ('
         #                             f'KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36"')
@@ -42,9 +42,15 @@ class Driver:
                     'no_proxy': 'localhost,127.0.0.1'
                 }
             }
-
-            driver = webdriver.Chrome(options=chrome_options, seleniumwire_options=options, service_args=args)
+            if undetected:
+                driver = uc.Chrome(options=chrome_options, seleniumwire_options=options, service_args=args,
+                                   use_subprocess=True)
+            else:
+                driver = webdriver.Chrome(options=chrome_options, seleniumwire_options=options, service_args=args)
         else:
-            driver = webdriver.Chrome(options=chrome_options, service_args=args)
+            if undetected:
+                driver = uc.Chrome(options=chrome_options, service_args=args, use_subprocess=True)
+            else:
+                driver = webdriver.Chrome(options=chrome_options, service_args=args)
 
         return driver

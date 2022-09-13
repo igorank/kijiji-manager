@@ -143,10 +143,10 @@ class Email(Driver):
                                     "2]/label/input").click()
                 driver.find_element("xpath",
                                     "/html/body/div[1]/article/div/div/div[2]/form/fieldset/div[3]/div[2]/button").click()
+                WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located(
+                        (By.XPATH, "/html/body/div[5]/div/div/div[2]/div[2]/div[1]/img")))
                 while True:
-                    WebDriverWait(driver, 10).until(
-                        EC.presence_of_element_located(
-                            (By.XPATH, "/html/body/div[5]/div/div/div[2]/div[2]/div[1]/img")))
                     time.sleep(2)  # TEMP solution (for image loading)
                     img = driver.find_element("xpath", "/html/body/div[5]/div/div/div[2]/div[2]/div[1]/img")
                     img.screenshot('names\\' + str(username) + '.png')
@@ -261,12 +261,12 @@ class Email(Driver):
                         print('Done.')
                         print('Finishing registration.', end=' ')
                         self.successful_registrations += 1
-                        # driver.close()
-                        # driver.quit()
+                        driver.close()
+                        driver.quit()
                         print('Done.')
                         # IPChanger.change_ip(proxy.get_change_ip_url())
                         data = {'email': username + "@inbox.lv", 'email_pass': str(password),
-                                'imap_pass': str(IMAP_pass), 'driver': driver}
+                                'imap_pass': str(IMAP_pass)}
                         return data
                     elif hCaptcha_result == -1:
                         driver.close()
