@@ -15,6 +15,11 @@ def get_empty_row_in_col(worksheet, col_num):
     return len(worksheet.col_values(col_num)) + 1
 
 
+def get_all_columns(worksheet_id):
+    list_of_hashes = worksheet_id.get_all_records()
+    return list_of_hashes[0].keys()
+
+
 class GSheet:
 
     def __init__(self, key, keyfile_name):
