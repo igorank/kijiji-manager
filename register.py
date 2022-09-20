@@ -1,7 +1,10 @@
 import time
+
+import gsheet
 from proxy import Proxy
 from e_mail import Email
 from kijiji import Kijiji
+from gsheet import GSheet
 from threading import *
 import wx
 import resultevent
@@ -21,6 +24,7 @@ import resultevent
 # print(kijiji_acc.register(proxy, email_dict['email'], email_dict['imap_pass']))
 # # print(kijiji_acc.register(email_dict['email'], email_dict['imap_pass']))
 
+
 class ResultEvent(wx.PyEvent):
 
     def __init__(self, data):
@@ -35,6 +39,8 @@ class WorkerThread(Thread):
         self._notify_window = notify_window
         self._want_abort = 0
         self.num = int(num)
+        gsheets = GSheet("1gO3m2DJmO6Lwf27Wjustop9eyik9TGO5_9MeJZbetP0", "kijiji-362509-c751d3f68ea1.json")
+        self.main_sheet = gsheets.get_main_worksheet(0)
         self.start()
 
     def run(self):
@@ -55,8 +61,20 @@ class WorkerThread(Thread):
             del email
             print(email_dict)
 
-            kijiji_acc = Kijiji("chromedriver.exe")
-            print(kijiji_acc.register(proxy, email_dict['email'], email_dict['imap_pass']))
+            # kijiji_acc = Kijiji("chromedriver.exe")
+            # print(kijiji_acc.register(proxy, email_dict['email'], email_dict['imap_pass']))
+
+            ## Добавляем данные в таблицу
+            # Добавляем адр. почти в табл. (1 - стоблец с почт.)
+            empty_email_row = gsheet.get_empty_row_in_col(self.main_sheet, 1)
+            self.main_sheet.update_cell(empty_email_row, 1, email_dict['email'])
+            # Добавляем пароль от почти в табл. (3 - стоблец с пар. от почты)
+            self.main_sheet.update_cell(empty_email_row, 3, email_dict['email_pass'])
+            # Добавляем IMAP пароль от почти в табл. (4 - стоблец с пар. от почты)
+            self.main_sheet.update_cell(empty_email_row, 4, email_dict['imap_pass'])
+
+            i += 1
+        wx.PostEvent(self._notify_window, ResultEvent("Done"))
 
     def abort(self):
         """abort worker thread."""

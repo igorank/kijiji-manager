@@ -1,4 +1,5 @@
 import gspread
+from singletonmeta import SingletonMeta
 from oauth2client.service_account import ServiceAccountCredentials
 
 
@@ -20,7 +21,7 @@ def get_all_columns(worksheet_id):
     return list_of_hashes[0].keys()
 
 
-class GSheet:
+class GSheet(metaclass=SingletonMeta):
 
     def __init__(self, key, keyfile_name):
         self.gs_client = get_gs_client(key, keyfile_name)
