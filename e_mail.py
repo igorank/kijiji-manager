@@ -146,13 +146,17 @@ class Email(Driver):
                 WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located(
                         (By.XPATH, "/html/body/div[5]/div/div/div[2]/div[2]/div[1]/img")))
+                print('Done.')
+                second_try = False
                 while True:
+                    print('Solving the CAPTCHA.', end=' ')
                     time.sleep(2)  # TEMP solution (for image loading)
-                    img = driver.find_element("xpath", "/html/body/div[5]/div/div/div[2]/div[2]/div[1]/img")
+                    if second_try:
+                        img = driver.find_element(By.XPATH, '//img[@class="captcha__img img-responsive"]')
+                    else:
+                        img = driver.find_element("xpath", "/html/body/div[5]/div/div/div[2]/div[2]/div[1]/img")
                     img.screenshot('names\\' + str(username) + '.png')
-                    print('Done.')
                     try:
-                        print('Solving the CAPTCHA.', end=' ')
                         result = solver.normal('names\\' + str(username) + '.png')
                     except:
                         print('Failed.')
@@ -164,13 +168,18 @@ class Email(Driver):
 
                     os.remove('names\\' + str(username) + '.png')
 
-                    driver.find_element("xpath",
-                                        "/html/body/div[5]/div/div/div[2]/div[2]/div[2]/input[2]").send_keys(
-                        result['code'])
-                    driver.find_element("xpath", "/html/body/div[5]/div/div/div[3]/button[1]").click()
+                    if second_try:
+                        driver.find_element("xpath",
+                                            '//*[@id="signup_userpin"]').send_keys(result['code'])
+                        driver.find_element(By.XPATH, '//button[@class="btn btn-primary"]').click()  # Подтвердить
+                    else:
+                        driver.find_element("xpath",
+                                            "/html/body/div[5]/div/div/div[2]/div[2]/div[2]/input[2]").send_keys(
+                            result['code'])
+                        driver.find_element("xpath", "/html/body/div[5]/div/div/div[3]/button[1]").click()
 
                     try:
-                        WebDriverWait(driver, 5).until(
+                        WebDriverWait(driver, 6).until(
                             EC.invisibility_of_element_located(
                                 (By.XPATH, "/html/body/div[5]/div/div/div[2]/div[2]/div[1]/img")))
                         print('Done.')
@@ -275,6 +284,7 @@ class Email(Driver):
                         break
                     elif hCaptcha_result == 0:
                         # driver.find_element(By.LINK_TEXT, 'Отмена').click()
+                        second_try = True
                         driver.find_element(By.XPATH, '//button[@class="btn btn-default"]').click()  # Отмена
                         WebDriverWait(driver, 10).until(EC.element_to_be_clickable(
                             (By.XPATH, '//*[@id="signup_submit"]')))

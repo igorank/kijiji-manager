@@ -35,11 +35,17 @@ class RegisterDialog(wx.Dialog):
         main_sizer.Add(row_builder([title_lbl, self.title_txt]),
                        0, wx.ALL)
 
-        cancel_btn = wx.Button(self, self.ID_START, label="Register")
-        cancel_btn.Bind(wx.EVT_BUTTON, self.on_register, id=self.ID_START)
+        register_btn = wx.Button(self, self.ID_START, label="Register")
+        register_btn.Bind(wx.EVT_BUTTON, self.on_register, id=self.ID_START)
+
+        cancel_btn = wx.Button(self, self.ID_START, label="Cancel")
+        cancel_btn.Bind(wx.EVT_BUTTON, self.on_cancel, id=self.ID_START)
+
+        btn_sizer.Add(register_btn, 0, wx.ALL, 5)
         btn_sizer.Add(cancel_btn, 0, wx.ALL, 5)
 
-        self.status = wx.StaticText(self, -1, '', pos=(0, 100))
+        # self.status = wx.StaticText(self, -1, '', pos=(0, 100))
+        self.status = wx.StaticText(self, -1, '')
         main_sizer.Add(btn_sizer, 0, wx.CENTER)
         self.SetSizerAndFit(main_sizer)
 
@@ -50,7 +56,14 @@ class RegisterDialog(wx.Dialog):
     def on_register(self, event):
         if not self.worker:
             self.status.SetLabel('Starting computation')
-            self.worker = WorkerThread(self)
+            self.worker = WorkerThread(self, self.title_txt.GetValue())
+
+    def on_cancel(self, event):
+        """Stop Computation."""
+        # Flag the worker thread to stop if running
+        if self.worker:
+            self.status.SetLabel('Trying to abort computation')
+            self.worker.abort()
 
     def OnResult(self, event):
         """Show Result status."""
