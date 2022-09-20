@@ -1,4 +1,6 @@
 import wx
+import dialogs
+from viewaccount import ViewDialog
 from ObjectListView import ObjectListView, ColumnDefn
 from gsheet import GSheet
 
@@ -12,16 +14,6 @@ class Account(object):
         self.imap_pass = imap_pass
         self.forwarding = forwarding
         self.useragent = useragent
-
-
-def show_message(message, caption, flag=wx.ICON_ERROR):
-    """
-    Show a message dialog
-    """
-    msg = wx.MessageDialog(None, message=message,
-                           caption=caption, style=flag)
-    msg.ShowModal()
-    msg.Destroy()
 
 
 class PostAdsPanel(wx.Panel):
@@ -45,33 +37,60 @@ class PostAdsPanel(wx.Panel):
         # self.dataOlv.cellEditMode = ObjectListView.CELLEDIT_SINGLECLICK
         self.dataOlv.cellEditMode = ObjectListView.CELLEDIT_DOUBLECLICK
 
+        # create an register button
+        registerBtn = wx.Button(self, wx.ID_ANY, "Register")
+        registerBtn.Bind(wx.EVT_BUTTON, self.registerControl)
+        btn_sizer.Add(registerBtn, 0, wx.ALL, 5)
+
         # create an update button
         updateBtn = wx.Button(self, wx.ID_ANY, "Update")
         updateBtn.Bind(wx.EVT_BUTTON, self.updateControl)
+        btn_sizer.Add(updateBtn, 0, wx.ALL, 5)
+
+        # create an update button
+        ViewBtn = wx.Button(self, wx.ID_ANY, "View Profile")
+        ViewBtn.Bind(wx.EVT_BUTTON, self.view_record)
+        btn_sizer.Add(ViewBtn, 0, wx.ALL, 5)
 
         # create an edit button
-        edit_record_btn = wx.Button(self, label="Edit")
+        edit_record_btn = wx.Button(self, label="Post Ad")
         edit_record_btn.Bind(wx.EVT_BUTTON, self.edit_record)
         btn_sizer.Add(edit_record_btn, 0, wx.ALL, 5)
 
         # Create some sizers
         mainSizer = wx.BoxSizer(wx.VERTICAL)
         mainSizer.Add(self.dataOlv, 1, wx.ALL | wx.EXPAND, 5)
-        mainSizer.Add(updateBtn, 0, wx.ALL | wx.CENTER, 5)
+        # mainSizer.Add(updateBtn, 0, wx.ALL | wx.CENTER, 5)
         mainSizer.Add(btn_sizer, 0, wx.CENTER)
         self.SetSizer(mainSizer)
 
+    def registerControl(self, event):
+        with dialogs.RegisterDialog() as dlg:
+            dlg.ShowModal()
+
     def edit_record(self, event):
         selected_row = self.dataOlv.GetSelectedObject()
-        if selected_row is None:
-            show_message('No row selected!', 'Error')
+        # selected_rows = self.dataOlv.GetSelectedObjects()
+        if not selected_row:
+            dialogs.show_message('No row selected!', 'Error')
             return
 
-        # with dialogs.RecordDialog(self.session,
-        #                           selected_row,
-        #                           title='Modify',
-        #                           addRecord=False) as dlg:
-        #     dlg.ShowModal()
+        with dialogs.RecordDialog(selected_row,
+                                  title='Post',
+                                  addRecord=False) as dlg:
+            dlg.ShowModal()
+
+        # self.show_all_records()
+
+    def view_record(self, event):
+        selected_row = self.dataOlv.GetSelectedObject()
+        # selected_rows = self.dataOlv.GetSelectedObjects()
+        if not selected_row:
+            dialogs.show_message('No row selected!', 'Error')
+            return
+
+        with ViewDialog() as dlg:
+            dlg.ShowModal()
 
         # self.show_all_records()
 
@@ -94,7 +113,7 @@ class PostAdsPanel(wx.Panel):
 
         self.dataOlv.SetObjects(self.data)
 
-    def setData(self, data=None):
+    def setData(self):
         self.dataOlv.SetColumns([
             ColumnDefn("Email", "left", -1, "email"),
             ColumnDefn("Kijiji password", "left", -1, "kijiji_pass"),
