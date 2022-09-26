@@ -1,6 +1,7 @@
 import wx
 import dialogs
 from viewaccount import ViewDialog
+from registerdialog import RegisterDialog
 from ObjectListView import ObjectListView, ColumnDefn
 from gsheet import GSheet
 
@@ -16,7 +17,7 @@ class Account(object):
         self.useragent = useragent
 
 
-class PostAdsPanel(wx.Panel):
+class MainPanel(wx.Panel):
 
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY)
@@ -65,7 +66,7 @@ class PostAdsPanel(wx.Panel):
         self.SetSizer(mainSizer)
 
     def registerControl(self, event):
-        with dialogs.RegisterDialog() as dlg:
+        with RegisterDialog() as dlg:
             dlg.ShowModal()
 
     def edit_record(self, event):

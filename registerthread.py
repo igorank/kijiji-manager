@@ -1,11 +1,10 @@
-import time
-
 import gsheet
 from proxy import Proxy
 from e_mail import Email
 from kijiji import Kijiji
 from gsheet import GSheet
 from threading import *
+from wx.lib.pubsub import pub
 import wx
 import resultevent
 
@@ -33,7 +32,7 @@ class ResultEvent(wx.PyEvent):
         self.data = data
 
 
-class WorkerThread(Thread):
+class RegisterThread(Thread):
     def __init__(self, notify_window, num):
         Thread.__init__(self)
         self._notify_window = notify_window
@@ -56,13 +55,19 @@ class WorkerThread(Thread):
         while i < self.num:
             proxy = Proxy(username="SUV4FU", password="eT3PAwKEqavC", host="oproxy.site", port="12536",
                           url="https://mobileproxy.space/reload.html?proxy_key=d7b59504de76caa1d494e882584cca74")
+            wx.CallAfter(pub.sendMessage, "update", msg="")
             email = Email("chromedriver.exe", "2e6af0bf44c9016665bdc7b83a8f0977")
+            wx.CallAfter(pub.sendMessage, "update", msg="")
             email_dict = email.register(proxy)
+            wx.CallAfter(pub.sendMessage, "update", msg="")
             del email
+            wx.CallAfter(pub.sendMessage, "update", msg="")
             print(email_dict)
+            wx.CallAfter(pub.sendMessage, "update", msg="")
 
             # kijiji_acc = Kijiji("chromedriver.exe")
             # print(kijiji_acc.register(proxy, email_dict['email'], email_dict['imap_pass']))
+            wx.CallAfter(pub.sendMessage, "update", msg="")
 
             ## Добавляем данные в таблицу
             # Добавляем адр. почти в табл. (1 - стоблец с почт.)
@@ -72,8 +77,12 @@ class WorkerThread(Thread):
             self.main_sheet.update_cell(empty_email_row, 3, email_dict['email_pass'])
             # Добавляем IMAP пароль от почти в табл. (4 - стоблец с пар. от почты)
             self.main_sheet.update_cell(empty_email_row, 4, email_dict['imap_pass'])
+            wx.CallAfter(pub.sendMessage, "update", msg="")
+            wx.CallAfter(pub.sendMessage, "update", msg="")
+            wx.CallAfter(pub.sendMessage, "update", msg="")
 
             i += 1
+            wx.CallAfter(pub.sendMessage, "update", msg="")
         wx.PostEvent(self._notify_window, ResultEvent("Done"))
 
     def abort(self):

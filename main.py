@@ -1,7 +1,7 @@
 import time
 import wx
 from gsheet import GSheet
-from postadspanel import PostAdsPanel
+from mainpanel import MainPanel
 from driver import Driver
 from proxy import Proxy
 from e_mail import Email
@@ -12,7 +12,7 @@ class MainFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self, parent=None, id=wx.ID_ANY,
                           title="Demo", size=(800, 600))
-        panel = PostAdsPanel(self)
+        panel = MainPanel(self)
 
 
 class GenApp(wx.App):

@@ -1,6 +1,4 @@
 import wx
-import resultevent
-from register import WorkerThread
 
 
 def show_message(message, caption, flag=wx.ICON_ERROR):
@@ -11,70 +9,6 @@ def show_message(message, caption, flag=wx.ICON_ERROR):
                            caption=caption, style=flag)
     msg.ShowModal()
     msg.Destroy()
-
-
-class RegisterDialog(wx.Dialog):
-
-    def __init__(self, title="Register"):
-        """Constructor"""
-        super().__init__(None, title="%s Accounts" % title)
-        self.ID_START = wx.NewId()
-        self.ID_STOP = wx.NewId()
-
-        # create the sizers
-        main_sizer = wx.BoxSizer(wx.VERTICAL)
-        author_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
-
-        # create some widgets
-        size = (130, -1)
-        font = wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD)
-        title_lbl = wx.StaticText(self, label="Number of profiles :", size=size)
-        title_lbl.SetFont(font)
-        self.title_txt = wx.TextCtrl(self, value="1")
-        main_sizer.Add(row_builder([title_lbl, self.title_txt]),
-                       0, wx.ALL)
-
-        register_btn = wx.Button(self, self.ID_START, label="Register")
-        register_btn.Bind(wx.EVT_BUTTON, self.on_register, id=self.ID_START)
-
-        cancel_btn = wx.Button(self, self.ID_START, label="Cancel")
-        cancel_btn.Bind(wx.EVT_BUTTON, self.on_cancel, id=self.ID_START)
-
-        btn_sizer.Add(register_btn, 0, wx.ALL, 5)
-        btn_sizer.Add(cancel_btn, 0, wx.ALL, 5)
-
-        # self.status = wx.StaticText(self, -1, '', pos=(0, 100))
-        self.status = wx.StaticText(self, -1, '')
-        main_sizer.Add(btn_sizer, 0, wx.CENTER)
-        self.SetSizerAndFit(main_sizer)
-
-        resultevent.EVT_RESULT(self, self.OnResult)
-
-        self.worker = None
-
-    def on_register(self, event):
-        if not self.worker:
-            self.status.SetLabel('Starting computation')
-            self.worker = WorkerThread(self, self.title_txt.GetValue())
-
-    def on_cancel(self, event):
-        """Stop Computation."""
-        # Flag the worker thread to stop if running
-        if self.worker:
-            self.status.SetLabel('Trying to abort computation')
-            self.worker.abort()
-
-    def OnResult(self, event):
-        """Show Result status."""
-        if event.data is None:
-            # Thread aborted (using our convention of None return)
-            self.status.SetLabel('Computation aborted')
-        else:
-            # Process results here
-            self.status.SetLabel('Computation Result: %s' % event.data)
-        # In either event, the worker is done
-        self.worker = None
 
 
 def row_builder(widgets):

@@ -1,6 +1,5 @@
 import random
 import string
-import time
 from driver import Driver
 from filemanager import FileManager
 from randomuserpass import RandomGenerator
