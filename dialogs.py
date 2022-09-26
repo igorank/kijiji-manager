@@ -38,9 +38,10 @@ class RecordDialog(wx.Dialog):
             email_pass = self.selected_row.email_pass
             imap_pass = self.selected_row.imap_pass
             forwarding = self.selected_row.forwarding
-            useragent = self.selected_row.useragent
+            # useragent = self.selected_row.useragent
         else:
-            email = kijiji_pass = email_pass = imap_pass = forwarding = useragent = ""
+            #email = kijiji_pass = email_pass = imap_pass = forwarding = useragent = ""
+            email = kijiji_pass = email_pass = imap_pass = forwarding = ""
 
         # create the sizers
         main_sizer = wx.BoxSizer(wx.VERTICAL)

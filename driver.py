@@ -14,6 +14,9 @@ class Driver:
         self.useragents = UserAgent("useragents\\useragents_win.txt")
         self.useragent = None
 
+    def get_useragent(self) -> str:
+        return self.useragent
+
     def setup_driver(self, proxy=None, headless=True, undetected=False, twocaptcha_ext=True):
         if undetected:
             chrome_options = uc.ChromeOptions()

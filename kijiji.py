@@ -31,11 +31,20 @@ class Kijiji(Driver):
         print('Done.')
 
         driver.get("https://www.kijiji.ca/")
-        WebDriverWait(driver, 20).until(
-            EC.presence_of_element_located((By.XPATH, '//*[@id="MainContainer"]/div[1]/div/div[2]/div/header/div['
-                                                      '3]/div/div[3]/div/div/div/a[1]')))
-        driver.find_element(By.XPATH, '//*[@id="MainContainer"]/div[1]/div/div[2]/div/header/div[3]/div/div['
-                                      '3]/div/div/div/a[1]').click()
+        # WebDriverWait(driver, 20).until(
+        #     EC.presence_of_element_located((By.XPATH,
+        #                                     '//*[@id="MainContainer"]/div[1]/div/div[2]/div/header/div[3]/div/div[3]/div/div/div/a[1]')))
+        while True:
+            try:
+                WebDriverWait(driver, 20).until(
+                    EC.presence_of_element_located((By.XPATH,
+                                                    '//a[@title="Register"]')))
+                break
+            except:
+                driver.refresh()
+        # driver.find_element(By.XPATH, '//*[@id="MainContainer"]/div[1]/div/div[2]/div/header/div[3]/div/div['
+        #                               '3]/div/div/div/a[1]').click()
+        driver.find_element(By.XPATH, '//a[@title="Register"]').click()
 
         name = random.choice(self.names)
         WebDriverWait(driver, 20).until(

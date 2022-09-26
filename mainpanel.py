@@ -8,13 +8,13 @@ from gsheet import GSheet
 
 class Account(object):
 
-    def __init__(self, email, kijiji_pass, email_pass, imap_pass, forwarding, useragent):
+    def __init__(self, email, kijiji_pass, email_pass, imap_pass, forwarding):
         self.email = email
         self.kijiji_pass = kijiji_pass
         self.email_pass = email_pass
         self.imap_pass = imap_pass
         self.forwarding = forwarding
-        self.useragent = useragent
+        #self.useragent = useragent
 
 
 class MainPanel(wx.Panel):
@@ -28,8 +28,10 @@ class MainPanel(wx.Panel):
         list_of_hashes = self.main_sheet.get_all_records()
         self.data = []
         for i in list_of_hashes:
+            # self.data.append(Account(i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
+            #                          i['Forwarding to'], i['Useragent']))
             self.data.append(Account(i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
-                                     i['Forwarding'], i['Useragent']))
+                                     i['Forwarding to']))
 
         self.dataOlv = ObjectListView(self, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         # self.dataOlv.SetEmptyListMsg("No Records Found")
@@ -109,8 +111,10 @@ class MainPanel(wx.Panel):
         # data = self.data + product_dict
         self.data = []
         for i in list_of_hashes:
+            # self.data.append(Account(i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
+            #                          i['Forwarding to'], i['Useragent']))
             self.data.append(Account(i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
-                                     i['Forwarding'], i['Useragent']))
+                                     i['Forwarding to']))
 
         self.dataOlv.SetObjects(self.data)
 
@@ -120,8 +124,8 @@ class MainPanel(wx.Panel):
             ColumnDefn("Kijiji password", "left", -1, "kijiji_pass"),
             ColumnDefn("Email Password", "left", -1, "email_pass"),
             ColumnDefn("IMAP password", "left", -1, "imap_pass"),
-            ColumnDefn("Forwarding", "left", -1, "forwarding"),
-            ColumnDefn("Useragent", "left", -1, "useragent")
+            ColumnDefn("Forwarding to", "left", -1, "forwarding"),
+            # ColumnDefn("Useragent", "left", -1, "useragent")
         ])
 
         self.dataOlv.SetObjects(self.data)

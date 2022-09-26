@@ -1,6 +1,6 @@
 import wx
 import resultevent
-from dialogs import row_builder
+from dialogs import row_builder, show_message
 from registerthread import RegisterThread
 from wx.lib.pubsub import pub
 
@@ -32,7 +32,7 @@ class RegisterDialog(wx.Dialog):
 
         # create some widgets
         font = wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD)
-        self.title_lbl = wx.StaticText(self, label="Number of profiles :", size=size)
+        self.title_lbl = wx.StaticText(self, label="Number of Profiles :", size=size)
         self.title_lbl.SetFont(font)
         self.title_txt = wx.TextCtrl(self, value="1")
         self.main_sizer.Add(row_builder([self.title_lbl, self.title_txt]),
@@ -62,6 +62,7 @@ class RegisterDialog(wx.Dialog):
 
         if self.count >= (int(self.num_profiles) * 100):
             self.Destroy()
+            show_message(f"{self.num_profiles} profiles have been registered!", 'Success', wx.ICON_INFORMATION)
 
         self.progress.SetValue(self.count)
 
@@ -74,7 +75,6 @@ class RegisterDialog(wx.Dialog):
 
             # Разрушаем текст и окно ввода количества акков
             self.num_profiles = self.title_txt.GetValue()
-            text_pos = self.title_txt.GetPosition()
             self.title_txt.Destroy()
             self.title_lbl.Destroy()
 
@@ -86,6 +86,7 @@ class RegisterDialog(wx.Dialog):
             self.worker = RegisterThread(self, self.num_profiles)
 
             self.progress.Show()
+            self.progress.SetRange((int(self.num_profiles)) * 100)
             pub.subscribe(self.updateProgress, "update")
             # self.main_sizer.Add(self.progress, 0, wx.CENTER, 5)
 

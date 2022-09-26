@@ -272,10 +272,11 @@ class Email(Driver):
                         self.successful_registrations += 1
                         driver.close()
                         driver.quit()
+                        useragent = self.get_useragent()
                         print('Done.')
                         # IPChanger.change_ip(proxy.get_change_ip_url())
                         data = {'email': username + "@inbox.lv", 'email_pass': str(password),
-                                'imap_pass': str(IMAP_pass)}
+                                'imap_pass': str(IMAP_pass), 'useragent': useragent}
                         return data
                     elif hCaptcha_result == -1:
                         driver.close()
