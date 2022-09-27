@@ -30,3 +30,21 @@ class EmailReader:
             time.sleep(1)
             it += 1
         return False
+
+    def get_forw_code(self, delay):
+        it = 0
+        while it <= delay:
+            messages = self.mb.fetch()
+            for msg in messages:
+                if msg.from_ == "support@inbox.lv":
+                    text = str(msg.html)
+                    index = text.find(
+                        'color:white;outline: none;display:inline-block;line-height:50px;margin-bottom:15px;margin-top:15px;">')
+                    start = text[index:]
+                    code_str = start.partition('</span>')[0]
+                    code = code_str[-6:]
+                    return code
+            time.sleep(1)
+            it += 1
+        return False
+

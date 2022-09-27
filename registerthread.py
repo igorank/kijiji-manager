@@ -67,7 +67,7 @@ class RegisterThread(Thread):
 
             kijiji_acc = Kijiji("chromedriver.exe")
             kijiji_dict = kijiji_acc.register(proxy, email_dict['email'], email_dict['imap_pass'])
-            # kijiji_dict = kijiji_acc.register(proxy, "dadadafoiafnoiafo@inbox.lv", "53653521")
+            #kijiji_dict = kijiji_acc.register(proxy, "dadadafoiafnoiafo@inbox.lv", "53653521")
             wx.CallAfter(pub.sendMessage, "update", msg="")
 
             ## Добавляем данные в таблицу

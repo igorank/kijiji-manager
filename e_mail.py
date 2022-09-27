@@ -6,6 +6,7 @@ from ipchanger import IPChanger
 from twocaptcha import TwoCaptcha
 from tempmail import GuerrillaMail
 from filemanager import FileManager
+from imapreader import EmailReader
 from randomuserpass import RandomGenerator
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -248,6 +249,32 @@ class Email(Driver):
                             (By.XPATH, "/html/body/div[3]/nav/ul/li[7]/a")))  # settings button
                         driver.find_element("xpath",
                                             "/html/body/div[3]/nav/ul/li[7]/a").click()  # settings button
+
+                        if True:
+                            WebDriverWait(driver, 20).until(EC.presence_of_element_located(
+                                (By.XPATH, '//*[@id="options-menu_li_forward_list-aliases-forward"]')))
+                            driver.find_element("xpath",
+                                                '//*[@id="options-menu_li_forward_list-aliases-forward"]').click()
+                            WebDriverWait(driver, 20).until(EC.presence_of_element_located(
+                                (By.XPATH, '/html/body/div[2]/div[2]/section/article/div/div[1]/div/div[2]/div/a')))
+                            driver.find_element("xpath",
+                                                '/html/body/div[2]/div[2]/section/article/div/div[1]/div/div[2]/div/a').click()
+                            WebDriverWait(driver, 20).until(EC.presence_of_element_located(
+                                (By.XPATH, '//*[@id="eml-forwarding-container"]/div[2]/div[1]/div/input')))
+                            driver.find_element("xpath",
+                                                '//*[@id="eml-forwarding-container"]/div[2]/div[1]/div/input').send_keys("ktrhteblpavynbpqniuo@outlook.com")
+                            driver.find_element("xpath",
+                                                '//*[@id="btn_add-email"]').click()
+
+                            mail_reader = EmailReader("outlook.office365.com", "ktrhteblpavynbpqniuo@outlook.com", "1995igor1607")
+                            code = mail_reader.get_forw_code(120)
+                            WebDriverWait(driver, 20).until(EC.presence_of_element_located(
+                                (By.XPATH, '//*[@id="container_prop-content_ol_existing-forwards"]/li/div/form/div/input')))
+                            driver.find_element("xpath",
+                                                '//*[@id="container_prop-content_ol_existing-forwards"]/li/div/form/div/input').send_keys(str(code))
+                            driver.find_element("xpath",
+                                                '//*[@id="container_prop-content_ol_existing-forwards"]/li/div/form/button').click()
+
                         WebDriverWait(driver, 15).until(EC.presence_of_element_located(
                             (By.XPATH,
                              "/html/body/div[2]/div[2]/section/aside/nav/ul/li[7]/a")))  # Outlook, почтовые программы
