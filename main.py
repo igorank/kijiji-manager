@@ -1,4 +1,5 @@
 import time
+import ctypes
 import wx
 from gsheet import GSheet
 from mainpanel import MainPanel
@@ -13,6 +14,11 @@ class MainFrame(wx.Frame):
         wx.Frame.__init__(self, parent=None, id=wx.ID_ANY,
                           title="Kijiji Manager", size=(800, 600))
         panel = MainPanel(self)
+
+        # Устанавливаем иконку
+        self.SetIcon(wx.Icon("icon.ico"))
+        myappid = 'mycompany.myproduct.subproduct.version'  # arbitrary string
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 
 class GenApp(wx.App):

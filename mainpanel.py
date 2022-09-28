@@ -28,8 +28,6 @@ class MainPanel(wx.Panel):
         list_of_hashes = self.main_sheet.get_all_records()
         self.data = []
         for i in list_of_hashes:
-            # self.data.append(Account(i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
-            #                          i['Forwarding to'], i['Useragent']))
             self.data.append(Account(i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
                                      i['Forwarding to']))
 
@@ -82,37 +80,20 @@ class MainPanel(wx.Panel):
             dialogs.show_message('Please select one profile from the list!', 'Error')
             return
 
-        print(self.data)
-        # for i in self.data:
-        #     if i.email == selected_row.email:
-        #         self.data.remove(i)
         cell = self.main_sheet.find(selected_row.email)
-        print("Found something at R%sC%s" % (cell.row, cell.col))
         self.main_sheet.delete_row(cell.row)
 
         # Update
         list_of_hashes = self.main_sheet.get_all_records()
 
-        # data = self.data + product_dict
         self.data = []
         for i in list_of_hashes:
-            # self.data.append(Account(i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
-            #                          i['Forwarding to'], i['Useragent']))
             self.data.append(Account(i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
                                      i['Forwarding to']))
 
         self.dataOlv.SetObjects(self.data)
 
         dialogs.show_message("Profile has been deleted!", 'Deleted', wx.ICON_INFORMATION)
-        #self.data.append(Account(i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
-        #                         i['Forwarding to']))
-
-        # with dialogs.RecordDialog(selected_row,
-        #                           title='Post',
-        #                           addRecord=False) as dlg:
-        #     dlg.ShowModal()
-
-        # self.show_all_records()
 
     # def edit_record(self, event):
     #     selected_row = self.dataOlv.GetSelectedObject()
@@ -141,21 +122,10 @@ class MainPanel(wx.Panel):
         # self.show_all_records()
 
     def updateControl(self, event):
-        # product_dict = [{"email": "Core Python Programming", "author": "Wesley Chun",
-        #                  "isbn": "0132269937", "mfg": "Prentice Hall"},
-        #                 {"email": "Python Programming for the Absolute Beginner",
-        #                  "author": "Michael Dawson", "isbn": "1598631128",
-        #                  "mfg": "Course Technology"},
-        #                 {"email": "Learning Python", "author": "Mark Lutz",
-        #                  "isbn": "0596513984", "mfg": "O'Reilly"}]
         list_of_hashes = self.main_sheet.get_all_records()
 
-
-        # data = self.data + product_dict
         self.data = []
         for i in list_of_hashes:
-            # self.data.append(Account(i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
-            #                          i['Forwarding to'], i['Useragent']))
             self.data.append(Account(i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
                                      i['Forwarding to']))
 
