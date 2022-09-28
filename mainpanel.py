@@ -45,6 +45,11 @@ class MainPanel(wx.Panel):
         registerBtn.Bind(wx.EVT_BUTTON, self.registerControl)
         btn_sizer.Add(registerBtn, 0, wx.ALL, 5)
 
+        # create delete button
+        deleteBtn = wx.Button(self, wx.ID_ANY, "Delete")
+        deleteBtn.Bind(wx.EVT_BUTTON, self.deleteControl)
+        btn_sizer.Add(deleteBtn, 0, wx.ALL, 5)
+
         # create an update button
         updateBtn = wx.Button(self, wx.ID_ANY, "Update")
         updateBtn.Bind(wx.EVT_BUTTON, self.updateControl)
@@ -56,9 +61,9 @@ class MainPanel(wx.Panel):
         btn_sizer.Add(ViewBtn, 0, wx.ALL, 5)
 
         # create an edit button
-        edit_record_btn = wx.Button(self, label="Post Ad")
-        edit_record_btn.Bind(wx.EVT_BUTTON, self.edit_record)
-        btn_sizer.Add(edit_record_btn, 0, wx.ALL, 5)
+        # edit_record_btn = wx.Button(self, label="Post Ad")
+        # edit_record_btn.Bind(wx.EVT_BUTTON, self.edit_record)
+        # btn_sizer.Add(edit_record_btn, 0, wx.ALL, 5)
 
         # Create some sizers
         mainSizer = wx.BoxSizer(wx.VERTICAL)
@@ -71,25 +76,63 @@ class MainPanel(wx.Panel):
         with RegisterDialog() as dlg:
             dlg.ShowModal()
 
-    def edit_record(self, event):
+    def deleteControl(self, event):
         selected_row = self.dataOlv.GetSelectedObject()
-        # selected_rows = self.dataOlv.GetSelectedObjects()
         if not selected_row:
-            dialogs.show_message('No row selected!', 'Error')
+            dialogs.show_message('Please select one profile from the list!', 'Error')
             return
 
-        with dialogs.RecordDialog(selected_row,
-                                  title='Post',
-                                  addRecord=False) as dlg:
-            dlg.ShowModal()
+        print(self.data)
+        # for i in self.data:
+        #     if i.email == selected_row.email:
+        #         self.data.remove(i)
+        cell = self.main_sheet.find(selected_row.email)
+        print("Found something at R%sC%s" % (cell.row, cell.col))
+        self.main_sheet.delete_row(cell.row)
+
+        # Update
+        list_of_hashes = self.main_sheet.get_all_records()
+
+        # data = self.data + product_dict
+        self.data = []
+        for i in list_of_hashes:
+            # self.data.append(Account(i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
+            #                          i['Forwarding to'], i['Useragent']))
+            self.data.append(Account(i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
+                                     i['Forwarding to']))
+
+        self.dataOlv.SetObjects(self.data)
+
+        dialogs.show_message("Profile has been deleted!", 'Deleted', wx.ICON_INFORMATION)
+        #self.data.append(Account(i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
+        #                         i['Forwarding to']))
+
+        # with dialogs.RecordDialog(selected_row,
+        #                           title='Post',
+        #                           addRecord=False) as dlg:
+        #     dlg.ShowModal()
 
         # self.show_all_records()
+
+    # def edit_record(self, event):
+    #     selected_row = self.dataOlv.GetSelectedObject()
+    #     # selected_rows = self.dataOlv.GetSelectedObjects()
+    #     if not selected_row:
+    #         dialogs.show_message('No row selected!', 'Error')
+    #         return
+    #
+    #     with dialogs.RecordDialog(selected_row,
+    #                               title='Post',
+    #                               addRecord=False) as dlg:
+    #         dlg.ShowModal()
+    #
+    #     # self.show_all_records()
 
     def view_record(self, event):
         selected_row = self.dataOlv.GetSelectedObject()
         # selected_rows = self.dataOlv.GetSelectedObjects()
         if not selected_row:
-            dialogs.show_message('No row selected!', 'Error')
+            dialogs.show_message('Please select one profile from the list!', 'Error')
             return
 
         with ViewDialog() as dlg:
@@ -117,6 +160,8 @@ class MainPanel(wx.Panel):
                                      i['Forwarding to']))
 
         self.dataOlv.SetObjects(self.data)
+
+        dialogs.show_message("The spreadsheet has been updated!", 'Updated', wx.ICON_INFORMATION)
 
     def setData(self):
         self.dataOlv.SetColumns([
