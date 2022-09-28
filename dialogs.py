@@ -11,13 +11,13 @@ def show_message(message, caption, flag=wx.ICON_ERROR):
     msg.Destroy()
 
 
-def row_builder(widgets):
+def row_builder(widgets, lbl_border=5):
     """
     Helper function for building a row of widgets
     """
     sizer = wx.BoxSizer(wx.HORIZONTAL)
     lbl, txt = widgets
-    sizer.Add(lbl, 0, wx.ALL, 5)
+    sizer.Add(lbl, 0, wx.ALL, lbl_border)
     sizer.Add(txt, 1, wx.ALL, 5)
     return sizer
 

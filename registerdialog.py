@@ -1,3 +1,5 @@
+import time
+
 import wx
 import resultevent
 from dialogs import row_builder, show_message
@@ -31,11 +33,11 @@ class RegisterDialog(wx.Dialog):
         self.main_sizer.Add(self.progress, 0, wx.CENTER | wx.ALL, 10)
 
         # create some widgets
-        font = wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD)
+        # font = wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD)
         self.title_lbl = wx.StaticText(self, label="Number of Profiles :", size=size)
-        self.title_lbl.SetFont(font)
-        self.title_txt = wx.TextCtrl(self, value="1")
-        self.main_sizer.Add(row_builder([self.title_lbl, self.title_txt]),
+        # self.title_lbl.SetFont(font)
+        self.title_txt = wx.TextCtrl(self, value="1", size=(65, -1))
+        self.main_sizer.Add(row_builder([self.title_lbl, self.title_txt], 10),
                        0, wx.ALL)
 
         self.register_btn = wx.Button(self, self.ID_START, label="Register")
@@ -78,11 +80,11 @@ class RegisterDialog(wx.Dialog):
             self.title_txt.Destroy()
             self.title_lbl.Destroy()
 
-            self.status.SetPosition((95, 40))
+            self.status.SetLabel('Registering...')
+            self.status.SetPosition((int(self.GetSize()[0]/2) - int(self.status.GetSize()[0]/2), 40))
             self.main_sizer.Add(self.status, 0, wx.CENTER, 5)
 
             # Запускаем поток регистрации
-            self.status.SetLabel('Registering...')
             self.worker = RegisterThread(self, self.num_profiles)
 
             self.progress.Show()
@@ -94,8 +96,9 @@ class RegisterDialog(wx.Dialog):
         """Stop Computation."""
         # Flag the worker thread to stop if running
         if self.worker:
-            self.status.SetPosition((95, 40))
+            # self.status.SetPosition((70, 40))
             self.status.SetLabel('Canceling...')
+            self.status.SetPosition((int(self.GetSize()[0] / 2) - int(self.status.GetSize()[0] / 2), 40))
             self.worker.abort()
         else:
             self.Destroy()
