@@ -44,13 +44,6 @@ class RegisterThread(Thread):
 
     def run(self):
         """Run Worker Thread."""
-        # for i in range(10):
-        #     time.sleep(1)
-        #     print(i)
-        #     if self._want_abort:
-        #         wx.PostEvent(self._notify_window, ResultEvent(None))
-        #         return
-        # wx.PostEvent(self._notify_window, ResultEvent(10))
         i = 0
         while i < self.num:
             proxy = Proxy(username="SUV4FU", password="eT3PAwKEqavC", host="oproxy.site", port="12536",
@@ -67,6 +60,7 @@ class RegisterThread(Thread):
 
             kijiji_acc = Kijiji("chromedriver.exe")
             kijiji_dict = kijiji_acc.register(proxy, email_dict['email'], email_dict['imap_pass'])
+            print(kijiji_dict['cookies'])
             #kijiji_dict = kijiji_acc.register(proxy, "dadadafoiafnoiafo@inbox.lv", "53653521")
             wx.CallAfter(pub.sendMessage, "update", msg="")
 
@@ -80,6 +74,8 @@ class RegisterThread(Thread):
             self.main_sheet.update_cell(empty_email_row, 3, email_dict['email_pass'])
             # Добавляем IMAP пароль от почти в табл. (4 - стоблец с пар. от почты)
             self.main_sheet.update_cell(empty_email_row, 4, email_dict['imap_pass'])
+            # Добавляем Forwarding to в табл. (5 - стоблец с пар. от почты)
+            self.main_sheet.update_cell(empty_email_row, 5, email_dict['forwarding_email'])
             # Добавляем UserAgent в табл. (6 - стоблец с пар. от почты)
             self.main_sheet.update_cell(empty_email_row, 6, email_dict['useragent'])
             wx.CallAfter(pub.sendMessage, "update", msg="")

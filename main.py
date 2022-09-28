@@ -11,7 +11,7 @@ from kijiji import Kijiji
 class MainFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self, parent=None, id=wx.ID_ANY,
-                          title="Demo", size=(800, 600))
+                          title="Kijiji Manager", size=(800, 600))
         panel = MainPanel(self)
 
 

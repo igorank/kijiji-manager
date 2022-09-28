@@ -1,6 +1,7 @@
 import random
 import string
 from driver import Driver
+from ipchanger import IPChanger
 from filemanager import FileManager
 from randomuserpass import RandomGenerator
 from selenium.webdriver.common.by import By
@@ -12,6 +13,14 @@ from selenium.webdriver.support.ui import Select
 
 def random_upper_letter():
     return ''.join(random.choices(string.ascii_uppercase))
+
+
+def get_cookies(driver):
+    cookies = driver.get_cookies()
+    cookies_dict = {}
+    for cookie in cookies:
+        cookies_dict[cookie['name']] = cookie['value']
+    return cookies_dict
 
 
 class Kijiji(Driver):
@@ -70,7 +79,13 @@ class Kijiji(Driver):
         mail_reader = EmailReader("mail.inbox.lv", email, imap_pass)
         verf_link = mail_reader.get_verf_link(120)
         print(verf_link)
+        cookies = get_cookies(driver)
+        data['cookies'] = cookies
         driver.get(verf_link)
+        driver.close()
+        driver.quit()
+
+        IPChanger.change_ip(proxy.get_change_ip_url()) # меняем IP
 
         return data
 

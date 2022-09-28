@@ -43,6 +43,7 @@ class EmailReader:
                     start = text[index:]
                     code_str = start.partition('</span>')[0]
                     code = code_str[-6:]
+                    self.mb.delete(msg.uid)
                     return code
             time.sleep(1)
             it += 1

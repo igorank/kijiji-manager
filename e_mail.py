@@ -85,6 +85,35 @@ class Email(Driver):
         print("Failed (Failed to get IMAP password).")
         return False
 
+    @staticmethod
+    def add_email_forwarding(driver) -> str:
+        WebDriverWait(driver, 20).until(EC.element_to_be_clickable(
+            (By.XPATH, '//*[@id="options-menu_li_forward_list-aliases-forward"]')))
+        driver.find_element("xpath",
+                            '//*[@id="options-menu_li_forward_list-aliases-forward"]').click()
+        WebDriverWait(driver, 20).until(EC.presence_of_element_located(
+            (By.XPATH, '/html/body/div[2]/div[2]/section/article/div/div[1]/div/div[2]/div/a')))
+        driver.find_element("xpath",
+                            '/html/body/div[2]/div[2]/section/article/div/div[1]/div/div[2]/div/a').click()
+        WebDriverWait(driver, 20).until(EC.presence_of_element_located(
+            (By.XPATH, '//*[@id="eml-forwarding-container"]/div[2]/div[1]/div/input')))
+        driver.find_element("xpath",
+                            '//*[@id="eml-forwarding-container"]/div[2]/div[1]/div/input').send_keys(
+            "ktrhteblpavynbpqniuo@outlook.com")
+        driver.find_element("xpath",
+                            '//*[@id="btn_add-email"]').click()
+        forw_email = "ktrhteblpavynbpqniuo@outlook.com"
+        mail_reader = EmailReader("outlook.office365.com", forw_email, "1995igor1607")
+        code = mail_reader.get_forw_code(120)
+        WebDriverWait(driver, 20).until(EC.presence_of_element_located(
+            (By.XPATH, '//*[@id="container_prop-content_ol_existing-forwards"]/li/div/form/div/input')))
+        driver.find_element("xpath",
+                            '//*[@id="container_prop-content_ol_existing-forwards"]/li/div/form/div/input').send_keys(
+            str(code))
+        driver.find_element("xpath",
+                            '//*[@id="container_prop-content_ol_existing-forwards"]/li/div/form/button').click()
+        return forw_email
+
     def register(self, proxy) -> dict:
 
         solver = TwoCaptcha(self.twocaptcha_api_key)
@@ -249,32 +278,6 @@ class Email(Driver):
                             (By.XPATH, "/html/body/div[3]/nav/ul/li[7]/a")))  # settings button
                         driver.find_element("xpath",
                                             "/html/body/div[3]/nav/ul/li[7]/a").click()  # settings button
-
-                        if True:
-                            WebDriverWait(driver, 20).until(EC.presence_of_element_located(
-                                (By.XPATH, '//*[@id="options-menu_li_forward_list-aliases-forward"]')))
-                            driver.find_element("xpath",
-                                                '//*[@id="options-menu_li_forward_list-aliases-forward"]').click()
-                            WebDriverWait(driver, 20).until(EC.presence_of_element_located(
-                                (By.XPATH, '/html/body/div[2]/div[2]/section/article/div/div[1]/div/div[2]/div/a')))
-                            driver.find_element("xpath",
-                                                '/html/body/div[2]/div[2]/section/article/div/div[1]/div/div[2]/div/a').click()
-                            WebDriverWait(driver, 20).until(EC.presence_of_element_located(
-                                (By.XPATH, '//*[@id="eml-forwarding-container"]/div[2]/div[1]/div/input')))
-                            driver.find_element("xpath",
-                                                '//*[@id="eml-forwarding-container"]/div[2]/div[1]/div/input').send_keys("ktrhteblpavynbpqniuo@outlook.com")
-                            driver.find_element("xpath",
-                                                '//*[@id="btn_add-email"]').click()
-
-                            mail_reader = EmailReader("outlook.office365.com", "ktrhteblpavynbpqniuo@outlook.com", "1995igor1607")
-                            code = mail_reader.get_forw_code(120)
-                            WebDriverWait(driver, 20).until(EC.presence_of_element_located(
-                                (By.XPATH, '//*[@id="container_prop-content_ol_existing-forwards"]/li/div/form/div/input')))
-                            driver.find_element("xpath",
-                                                '//*[@id="container_prop-content_ol_existing-forwards"]/li/div/form/div/input').send_keys(str(code))
-                            driver.find_element("xpath",
-                                                '//*[@id="container_prop-content_ol_existing-forwards"]/li/div/form/button').click()
-
                         WebDriverWait(driver, 15).until(EC.presence_of_element_located(
                             (By.XPATH,
                              "/html/body/div[2]/div[2]/section/aside/nav/ul/li[7]/a")))  # Outlook, почтовые программы
@@ -294,6 +297,11 @@ class Email(Driver):
                             driver.quit()
                             IPChanger.change_ip(proxy.get_change_ip_url())
                             continue
+                        driver.find_element("xpath", '//*[@id="pop3-pass-modal-submit"]').click()  # OK Button
+                        print('Done.')
+                        print('Setting up email forwarding.', end=' ')
+                        if True:
+                            forw_email = self.add_email_forwarding(driver)
                         print('Done.')
                         print('Finishing registration.', end=' ')
                         self.successful_registrations += 1
@@ -303,7 +311,7 @@ class Email(Driver):
                         print('Done.')
                         # IPChanger.change_ip(proxy.get_change_ip_url())
                         data = {'email': username + "@inbox.lv", 'email_pass': str(password),
-                                'imap_pass': str(IMAP_pass), 'useragent': useragent}
+                                'imap_pass': str(IMAP_pass), 'useragent': useragent, 'forwarding_email': forw_email}
                         return data
                     elif hCaptcha_result == -1:
                         driver.close()
