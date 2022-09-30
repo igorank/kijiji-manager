@@ -1,12 +1,22 @@
 import wx
+from kijiji_api import KijijiApi
 from dialogs import row_builder
 
 
 class ViewDialog(wx.Dialog):
 
-    def __init__(self, title="View"):
+    # def __init__(self, selected_row, title="Profile"):
+    def __init__(self, selected_row):
         """Constructor"""
-        super().__init__(None, title="%s Accounts" % title)
+        super().__init__(None, title="%s's profile" % selected_row.email)
+        # super().__init__(None, title=title)
+
+        self.k_api = KijijiApi()
+        self.user_id, self.token = self.k_api.login(selected_row.email, selected_row.kijiji_pass)
+        self.profile_info = self.k_api.get_profile(self.user_id, self.token)
+        print(self.profile_info)
+        self.ads = self.k_api.get_ad(self.user_id, self.token)
+        print(self.ads)
 
         # create the sizers
         main_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -22,9 +32,13 @@ class ViewDialog(wx.Dialog):
         main_sizer.Add(row_builder([title_lbl, self.title_txt]),
                        0, wx.ALL)
 
-        cancel_btn = wx.Button(self, label="Close")
-        cancel_btn.Bind(wx.EVT_BUTTON, self.on_register)
-        btn_sizer.Add(cancel_btn, 0, wx.ALL, 5)
+        post_ad_btn = wx.Button(self, label="Post Ad")
+        post_ad_btn.Bind(wx.EVT_BUTTON, self.on_register)
+        btn_sizer.Add(post_ad_btn, 0, wx.ALL, 5)
+
+        delete_ad_btn = wx.Button(self, label="Delete Ad")
+        delete_ad_btn.Bind(wx.EVT_BUTTON, self.on_register)
+        btn_sizer.Add(delete_ad_btn, 0, wx.ALL, 5)
 
         main_sizer.Add(btn_sizer, 0, wx.CENTER)
         self.SetSizerAndFit(main_sizer)

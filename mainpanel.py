@@ -116,7 +116,7 @@ class MainPanel(wx.Panel):
             dialogs.show_message('Please select one profile from the list!', 'Error')
             return
 
-        with ViewDialog() as dlg:
+        with ViewDialog(selected_row) as dlg:
             dlg.ShowModal()
 
         # self.show_all_records()
