@@ -1,6 +1,6 @@
 import wx
 import dialogs
-from viewaccount import ViewDialog
+from viewprofile import ViewDialog
 from registerdialog import RegisterDialog
 from ObjectListView import ObjectListView, ColumnDefn
 from gsheet import GSheet
