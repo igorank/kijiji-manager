@@ -16,6 +16,10 @@ class AD(object):
         self.end_date = end_date
 
 
+def dateConverter(string):
+    x = string.split("T")
+    return x[0] + ' ' + x[1][:8]
+
 class ViewDialog(wx.Dialog):
 
     # def __init__(self, selected_row, title="Profile"):
@@ -96,8 +100,10 @@ class ViewDialog(wx.Dialog):
                                 i['cat:category']['cat:id-name'],
                                 i['ad:price']['types:amount'],
                                 i['ad:view-ad-count'],
-                                i['ad:start-date-time'][:10],
-                                i['ad:end-date-time'][:10]))
+                                # i['ad:start-date-time'][:10],
+                                dateConverter(i['ad:start-date-time']),
+                                # i['ad:end-date-time'][:10]))
+                                dateConverter(i['ad:end-date-time'])))
 
         # Если одна реклама
         # self.data.append(AD(self.ads['ad:ads']['ad:ad']['@id'], self.ads['ad:ads']['ad:ad']['ad:title'],
