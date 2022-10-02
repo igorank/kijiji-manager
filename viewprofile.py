@@ -86,7 +86,7 @@ class ViewDialog(wx.Dialog):
         self.email.SetFont(font_2)
         main_sizer.Add(row_builder([email_lbl, self.email]), 0, wx.ALL)
 
-        self.dataOlv = ObjectListView(self, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
+        self.dataOlv = ObjectListView(self, wx.ID_ANY, sortable=False, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
 
         # print(self.ads['ad:ads']['ad:ad'][0]['@id'])
 

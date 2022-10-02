@@ -31,12 +31,12 @@ class MainPanel(wx.Panel):
             self.data.append(Account(i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
                                      i['Forwarding to']))
 
-        self.dataOlv = ObjectListView(self, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
+        self.dataOlv = ObjectListView(self, wx.ID_ANY, sortable=False, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         # self.dataOlv.SetEmptyListMsg("No Records Found")
         self.setData()
-        # Allow the cell values to be edited when double-clicked
+        # Allow the cell values to be edited when double/single-clicked
         # self.dataOlv.cellEditMode = ObjectListView.CELLEDIT_SINGLECLICK
-        self.dataOlv.cellEditMode = ObjectListView.CELLEDIT_DOUBLECLICK
+        # self.dataOlv.cellEditMode = ObjectListView.CELLEDIT_DOUBLECLICK
 
         # create an register button
         registerBtn = wx.Button(self, wx.ID_ANY, "Register")
