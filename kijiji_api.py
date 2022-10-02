@@ -43,7 +43,7 @@ class KijijiApi:
             # e.g. for loading conversations
             timeout = httpx.Timeout(30.0, connect=30.0)
             # Added proxy
-            transport = SyncProxyTransport.from_url('socks5://Th9skxds1GOpDHjq:mobile;ca;@proxy.soax.com:9298')
+            transport = SyncProxyTransport.from_url('socks5://Th9skxds1GOpDHjq:mobile;ca;@proxy.soax.com:9296')
             self.session = httpx.Client(timeout=timeout, headers=self.headers, transport=transport)
 
     def login(self, username, password):

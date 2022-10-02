@@ -4,6 +4,18 @@ from dialogs import row_builder
 from ObjectListView import ObjectListView, ColumnDefn
 
 
+class AD(object):
+
+    def __init__(self, ad_id, title, category, price, views, start_date, end_date):
+        self.ad_id = ad_id
+        self.title = title
+        self.category = category
+        self.price = price
+        self.views = views
+        self.start_date = start_date
+        self.end_date = end_date
+
+
 class ViewDialog(wx.Dialog):
 
     # def __init__(self, selected_row, title="Profile"):
@@ -16,8 +28,15 @@ class ViewDialog(wx.Dialog):
         self.user_id, self.token = self.k_api.login(selected_row.email, selected_row.kijiji_pass)
         self.profile_info = self.k_api.get_profile(self.user_id, self.token)
         print(self.profile_info)
-        #self.ads = self.k_api.get_ad(self.user_id, self.token)
-        #print(self.ads)
+
+        self.ads = self.k_api.get_ad(self.user_id, self.token)
+        print(self.ads)
+        print(self.ads['ad:ads']['ad:ad'][0]['@id'])
+        # print(self.ads['ad:ads']['ad:ad']['@id'])
+        # print(self.ads['ad:ads']['ad:ad']['ad:title'])
+        # print(self.ads['ad:ads']['ad:ad']['cat:category']['cat:id-name'])
+        # print(self.ads['ad:ads']['ad:ad']['ad:price']['types:amount'])
+        # print(self.ads['ad:ads']['ad:ad']['ad:view-ad-count'])
 
         # create the sizers
         main_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -68,6 +87,26 @@ class ViewDialog(wx.Dialog):
         main_sizer.Add(row_builder([email_lbl, self.email]), 0, wx.ALL)
 
         self.dataOlv = ObjectListView(self, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
+
+        # print(self.ads['ad:ads']['ad:ad'][0]['@id'])
+
+        self.data = []
+        for i in self.ads['ad:ads']['ad:ad']:
+            self.data.append(AD(i['@id'], i['ad:title'],
+                                i['cat:category']['cat:id-name'],
+                                i['ad:price']['types:amount'],
+                                i['ad:view-ad-count'],
+                                i['ad:start-date-time'][:10],
+                                i['ad:end-date-time'][:10]))
+
+        # Если одна реклама
+        # self.data.append(AD(self.ads['ad:ads']['ad:ad']['@id'], self.ads['ad:ads']['ad:ad']['ad:title'],
+        #                     self.ads['ad:ads']['ad:ad']['cat:category']['cat:id-name'],
+        #                     self.ads['ad:ads']['ad:ad']['ad:price']['types:amount'],
+        #                     self.ads['ad:ads']['ad:ad']['ad:view-ad-count']))
+
+        self.dataOlv.SetObjects(self.data)
+
         self.setData()
 
         post_ad_btn = wx.Button(self, label="Post Ad")
@@ -95,9 +134,11 @@ class ViewDialog(wx.Dialog):
 
     def setData(self):
         self.dataOlv.SetColumns([
-            ColumnDefn("Ad ID", "left", -1, "email"),
-            ColumnDefn("Title", "left", -1, "kijiji_pass"),
-            ColumnDefn("Category", "left", -1, "email_pass"),
-            ColumnDefn("Price", "left", -1, "imap_pass"),
-            ColumnDefn("Views", "left", -1, "forwarding"),
+            ColumnDefn("Ad ID", "left", -1, "ad_id"),
+            ColumnDefn("Title", "left", -1, "title"),
+            ColumnDefn("Category", "left", -1, "category"),
+            ColumnDefn("Price", "left", -1, "price"),
+            ColumnDefn("Views", "left", -1, "views"),
+            ColumnDefn("Created", "left", -1, "start_date"),
+            ColumnDefn("Expires", "left", -1, "end_date"),
         ])
