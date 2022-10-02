@@ -138,7 +138,7 @@ class ViewDialog(wx.Dialog):
             ColumnDefn("Title", "left", -1, "title"),
             ColumnDefn("Category", "left", -1, "category"),
             ColumnDefn("Price", "left", -1, "price"),
-            ColumnDefn("Views", "left", -1, "views"),
+            ColumnDefn("Views", "left", 45, "views"),
             ColumnDefn("Created", "left", -1, "start_date"),
             ColumnDefn("Expires", "left", -1, "end_date"),
         ])
