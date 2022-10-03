@@ -31,7 +31,6 @@ class ViewDialog(wx.Dialog):
         # super().__init__(None, title=title)
         self.user_id = selected_row.user_id
         self.token = selected_row.token
-        self.data = None
         self.k_api = KijijiApi()
         self.profile_info = self.k_api.get_profile(self.user_id, self.token)
 
@@ -119,6 +118,8 @@ class ViewDialog(wx.Dialog):
             show_message("Ad has been removed!", 'Deleted', wx.ICON_INFORMATION)
         else:
             show_message('Something went wrong! Please try again later.', 'Error')
+
+        self.updateSpreadsheet()
 
     def on_post(self, event):
         """
