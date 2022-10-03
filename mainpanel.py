@@ -79,7 +79,7 @@ class MainPanel(wx.Panel):
     def deleteControl(self, event):
         selected_row = self.dataOlv.GetSelectedObject()
         if not selected_row:
-            dialogs.show_message('Please select one profile from the list!', 'Error')
+            helper.show_message('Please select one profile from the list!', 'Error')
             return
 
         cell = self.main_sheet.find(selected_row.email)
@@ -88,7 +88,7 @@ class MainPanel(wx.Panel):
         # Update
         self.updateSpreadsheet()
 
-        dialogs.show_message("Profile has been deleted!", 'Deleted', wx.ICON_INFORMATION)
+        helper.show_message("Profile has been deleted!", 'Deleted', wx.ICON_INFORMATION)
 
     # def edit_record(self, event):
     #     selected_row = self.dataOlv.GetSelectedObject()
@@ -108,7 +108,7 @@ class MainPanel(wx.Panel):
         selected_row = self.dataOlv.GetSelectedObject()
         # selected_rows = self.dataOlv.GetSelectedObjects()
         if not selected_row:
-            dialogs.show_message('Please select one profile from the list!', 'Error')
+            helper.show_message('Please select one profile from the list!', 'Error')
             return
 
         with ViewDialog(selected_row) as dlg:
@@ -118,7 +118,7 @@ class MainPanel(wx.Panel):
 
     def updateControl(self, event):
         self.updateSpreadsheet()
-        dialogs.show_message("The spreadsheet has been updated!", 'Updated', wx.ICON_INFORMATION)
+        helper.show_message("The spreadsheet has been updated!", 'Updated', wx.ICON_INFORMATION)
 
     def updateSpreadsheet(self):
         list_of_hashes = self.main_sheet.get_all_records()
