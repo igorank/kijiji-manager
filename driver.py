@@ -10,7 +10,7 @@ class Driver:
     def __init__(self, chrome_p) -> None:
         super().__init__()
         self.chromedriver_path = chrome_p
-        self.headless = None
+        self.headless = True
         self.useragents = UserAgent("useragents\\useragents_win.txt")
         self.useragent = None
 

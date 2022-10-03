@@ -35,8 +35,6 @@ class MainPanel(wx.Panel):
         self.dataOlv = ObjectListView(self, wx.ID_ANY, sortable=False, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         # self.dataOlv.SetEmptyListMsg("No Records Found")
         self.setData()
-        for i in range(7):
-            print(self.dataOlv.GetColumnWidth(i))
         # Allow the cell values to be edited when double/single-clicked
         # self.dataOlv.cellEditMode = ObjectListView.CELLEDIT_SINGLECLICK
         # self.dataOlv.cellEditMode = ObjectListView.CELLEDIT_DOUBLECLICK

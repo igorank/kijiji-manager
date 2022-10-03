@@ -1,4 +1,5 @@
 import wx
+from dialogs import show_message
 from kijiji_api import KijijiApi
 from dialogs import row_builder
 from ObjectListView import ObjectListView, ColumnDefn
@@ -28,11 +29,11 @@ class ViewDialog(wx.Dialog):
         """Constructor"""
         super().__init__(None, title="%s's profile" % selected_row.email, size=wx.Size(640, 480))
         # super().__init__(None, title=title)
-        user_id = selected_row.user_id
-        token = selected_row.token
-
+        self.user_id = selected_row.user_id
+        self.token = selected_row.token
+        self.data = None
         self.k_api = KijijiApi()
-        self.profile_info = self.k_api.get_profile(user_id, token)
+        self.profile_info = self.k_api.get_profile(self.user_id, self.token)
 
         # create the sizers
         main_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -52,11 +53,12 @@ class ViewDialog(wx.Dialog):
         registration_date_lbl = wx.StaticText(self, label="Registration date :")
         registration_date_lbl.SetFont(font)
         self.registration_date = wx.StaticText(self, label=self.profile_info['user:user-profile'][
-            'user:user-registration-date'][:10])
+                                                               'user:user-registration-date'][:10])
         self.registration_date.SetFont(font_2)
-        t_var = profileid_lbl.GetSize()[0] + self.profileid.GetSize()[0] + registration_date_lbl.GetSize()[0] + self.registration_date.GetSize()[0]
+        t_var = profileid_lbl.GetSize()[0] + self.profileid.GetSize()[0] + registration_date_lbl.GetSize()[0] + \
+                self.registration_date.GetSize()[0]
         spacer = self.GetSize()[0] - t_var
-        profileid_sizer.AddSpacer(spacer - int(t_var/5))    # 60 отступы
+        profileid_sizer.AddSpacer(spacer - int(t_var / 5))  # 60 отступы
         profileid_sizer.Add(registration_date_lbl, 0, wx.ALL, 5)
         profileid_sizer.Add(self.registration_date, 0, wx.ALL, 5)
         main_sizer.Add(profileid_sizer, 0, wx.ALL)
@@ -71,7 +73,9 @@ class ViewDialog(wx.Dialog):
         activeads_num_lbl.SetFont(font)
         self.ads_num = wx.StaticText(self, label=self.profile_info['user:user-profile']['user:user-active-ad-count'])
         self.ads_num.SetFont(font_2)
-        name_sizer.AddSpacer((spacer - (name_lbl.GetSize()[0] + self.name.GetSize()[0])) + self.registration_date.GetSize()[0])  # 64 отступы
+        name_sizer.AddSpacer(
+            (spacer - (name_lbl.GetSize()[0] + self.name.GetSize()[0])) + self.registration_date.GetSize()[
+                0])  # 64 отступы
         name_sizer.Add(activeads_num_lbl, 0, wx.ALL, 5)
         name_sizer.Add(self.ads_num, 0, wx.ALL, 5)
         main_sizer.Add(name_sizer, 0, wx.ALL)
@@ -85,42 +89,38 @@ class ViewDialog(wx.Dialog):
         self.dataOlv = ObjectListView(self, wx.ID_ANY, sortable=False, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         self.dataOlv.SetEmptyListMsg("No Ads")
 
-        if int(self.profile_info['user:user-profile']['user:user-active-ad-count']) > 0:
-            self.ads = self.k_api.get_ad(user_id, token)
-
-        self.data = []
-        if int(self.profile_info['user:user-profile']['user:user-active-ad-count']) > 1:
-            for i in self.ads['ad:ads']['ad:ad']:
-                self.data.append(AD(i['@id'], i['ad:title'],
-                                    i['cat:category']['cat:id-name'],
-                                    i['ad:price']['types:amount'],
-                                    i['ad:view-ad-count'],
-                                    dateConverter(i['ad:start-date-time']),
-                                    dateConverter(i['ad:end-date-time'])))
-        elif int(self.profile_info['user:user-profile']['user:user-active-ad-count']) == 1:
-            # Если одна реклама
-            self.data.append(AD(self.ads['ad:ads']['ad:ad']['@id'], self.ads['ad:ads']['ad:ad']['ad:title'],
-                                self.ads['ad:ads']['ad:ad']['cat:category']['cat:id-name'],
-                                self.ads['ad:ads']['ad:ad']['ad:price']['types:amount'],
-                                self.ads['ad:ads']['ad:ad']['ad:view-ad-count'],
-                                dateConverter(self.ads['ad:ads']['ad:ad']['ad:start-date-time']),
-                                dateConverter(self.ads['ad:ads']['ad:ad']['ad:end-date-time'])))
-        self.dataOlv.SetObjects(self.data)
+        # if int(self.profile_info['user:user-profile']['user:user-active-ad-count']) > 0:
+        #     self.ads = self.k_api.get_ad(self.user_id, self.token)
+        self.updateSpreadsheet()
         self.setData()
 
         post_ad_btn = wx.Button(self, label="Post Ad")
-        post_ad_btn.Bind(wx.EVT_BUTTON, self.on_register)
+        post_ad_btn.Bind(wx.EVT_BUTTON, self.on_post)
         btn_sizer.Add(post_ad_btn, 0, wx.ALL, 5)
 
         delete_ad_btn = wx.Button(self, label="Delete Ad")
-        delete_ad_btn.Bind(wx.EVT_BUTTON, self.on_register)
+        delete_ad_btn.Bind(wx.EVT_BUTTON, self.on_delete)
         btn_sizer.Add(delete_ad_btn, 0, wx.ALL, 5)
 
         main_sizer.Add(self.dataOlv, 1, wx.ALL | wx.EXPAND, 5)
         main_sizer.Add(btn_sizer, 0, wx.CENTER)
         self.SetSizer(main_sizer)
 
-    def on_register(self):
+    def on_delete(self, event):
+        selected_row = self.dataOlv.GetSelectedObject()
+
+        if not selected_row:
+            show_message('Please select one advertisement from the list!', 'Error')
+            return
+
+        status = self.k_api.delete_ad(self.user_id, self.token, selected_row.ad_id)
+
+        if status:
+            show_message("Ad has been removed!", 'Deleted', wx.ICON_INFORMATION)
+        else:
+            show_message('Something went wrong! Please try again later.', 'Error')
+
+    def on_post(self, event):
         """
         Edit a record in the database
         """
@@ -131,12 +131,34 @@ class ViewDialog(wx.Dialog):
         #              wx.ICON_INFORMATION)
         self.Close()
 
+    def updateSpreadsheet(self):
+        ads = self.k_api.get_ad(self.user_id, self.token)
+
+        data = []
+        if 'ad:ad' in ads['ad:ads']:
+            if type(ads['ad:ads']['ad:ad']) is list:
+                for i in ads['ad:ads']['ad:ad']:
+                    data.append(AD(i['@id'], i['ad:title'],
+                                   i['cat:category']['cat:id-name'],
+                                   i['ad:price']['types:amount'],
+                                   i['ad:view-ad-count'],
+                                   dateConverter(i['ad:start-date-time']),
+                                   dateConverter(i['ad:end-date-time'])))
+            elif type(ads['ad:ads']['ad:ad']) is dict:                  # Если одна реклама
+                data.append(AD(ads['ad:ads']['ad:ad']['@id'], ads['ad:ads']['ad:ad']['ad:title'],
+                               ads['ad:ads']['ad:ad']['cat:category']['cat:id-name'],
+                               ads['ad:ads']['ad:ad']['ad:price']['types:amount'],
+                               ads['ad:ads']['ad:ad']['ad:view-ad-count'],
+                               dateConverter(ads['ad:ads']['ad:ad']['ad:start-date-time']),
+                               dateConverter(ads['ad:ads']['ad:ad']['ad:end-date-time'])))
+        self.dataOlv.SetObjects(data)
+
     def setData(self):
         self.dataOlv.SetColumns([
             ColumnDefn("Ad ID", "left", 70, "ad_id", minimumWidth=70),
             ColumnDefn("Title", "left", 128, "title", minimumWidth=128),
             ColumnDefn("Category", "left", 124, "category", minimumWidth=124),
-            ColumnDefn("Price", "left", 45, "price", minimumWidth=45),
+            ColumnDefn("Price", "left", 50, "price", minimumWidth=50),
             ColumnDefn("Views", "left", 45, "views", minimumWidth=45),
             ColumnDefn("Created", "left", 117, "start_date", minimumWidth=117),
             ColumnDefn("Expires", "left", 117, "end_date", minimumWidth=117),
