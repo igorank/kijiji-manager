@@ -2,19 +2,20 @@ from xml.parsers.expat import ExpatError, errors
 from httpx_socks import SyncProxyTransport
 import httpx
 import xmltodict
+from singletonmeta import SingletonMeta
 
 
 class KijijiApiException(Exception):
     """KijijiApi class exception"""
 
 
-class KijijiApi:
+class KijijiApi(metaclass=SingletonMeta):
     """API for interfacing with Kijiji site
     This class is stateless and does not manage user logins on its own.
     Must login first to use methods that require a user ID and token.
     Methods raise KijijiApiException on errors
     """
-    def __init__(self, session=None):
+    def __init__(self, session=None, proxy=None):
 
         # Base API URL
         self.base_url = 'https://mingle.kijiji.ca/api'
@@ -43,8 +44,12 @@ class KijijiApi:
             # e.g. for loading conversations
             timeout = httpx.Timeout(30.0, connect=30.0)
             # Added proxy
-            transport = SyncProxyTransport.from_url('socks5://Th9skxds1GOpDHjq:mobile;ca;@proxy.soax.com:9296')
-            self.session = httpx.Client(timeout=timeout, headers=self.headers, transport=transport)
+            if proxy is not None:
+                transport = SyncProxyTransport.from_url('socks5://' + proxy.get_username() + ':' + proxy.get_password()
+                                                        + '@' + proxy.get_host() + ':' + proxy.get_port())
+                self.session = httpx.Client(timeout=timeout, headers=self.headers, transport=transport)
+            else:
+                self.session = httpx.Client(timeout=timeout, headers=self.headers)
 
     def login(self, username, password):
         """Login to Kijiji
@@ -60,7 +65,7 @@ class KijijiApi:
         }
 
         r = self.session.post(f'{self.base_url}/users/login', headers=headers, data=payload)
-        print(r.text)
+        # print(r.text)
         doc = self._parse_response(r.text)
 
         if r.status_code == 200:

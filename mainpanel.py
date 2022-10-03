@@ -8,13 +8,14 @@ from gsheet import GSheet
 
 class Account(object):
 
-    def __init__(self, email, kijiji_pass, email_pass, imap_pass, forwarding):
+    def __init__(self, user_id, email, kijiji_pass, email_pass, imap_pass, forwarding, token):
+        self.user_id = user_id
         self.email = email
         self.kijiji_pass = kijiji_pass
         self.email_pass = email_pass
         self.imap_pass = imap_pass
         self.forwarding = forwarding
-        #self.useragent = useragent
+        self.token = token
 
 
 class MainPanel(wx.Panel):
@@ -28,8 +29,8 @@ class MainPanel(wx.Panel):
         list_of_hashes = self.main_sheet.get_all_records()
         self.data = []
         for i in list_of_hashes:
-            self.data.append(Account(i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
-                                     i['Forwarding to']))
+            self.data.append(Account(i['User ID'], i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
+                                     i['Forwarding to'], i['Token']))
 
         self.dataOlv = ObjectListView(self, wx.ID_ANY, sortable=False, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         # self.dataOlv.SetEmptyListMsg("No Records Found")
@@ -88,8 +89,9 @@ class MainPanel(wx.Panel):
 
         self.data = []
         for i in list_of_hashes:
-            self.data.append(Account(i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
-                                     i['Forwarding to']))
+            self.data.append(
+                Account(i['User ID'], i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
+                        i['Forwarding to'], i['Token']))
 
         self.dataOlv.SetObjects(self.data)
 
@@ -126,8 +128,9 @@ class MainPanel(wx.Panel):
 
         self.data = []
         for i in list_of_hashes:
-            self.data.append(Account(i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
-                                     i['Forwarding to']))
+            self.data.append(
+                Account(i['User ID'], i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
+                        i['Forwarding to'], i['Token']))
 
         self.dataOlv.SetObjects(self.data)
 
@@ -135,12 +138,13 @@ class MainPanel(wx.Panel):
 
     def setData(self):
         self.dataOlv.SetColumns([
+            ColumnDefn("User ID", "left", -1, "user_id"),
             ColumnDefn("Email", "left", -1, "email"),
             ColumnDefn("Kijiji password", "left", -1, "kijiji_pass"),
             ColumnDefn("Email Password", "left", -1, "email_pass"),
             ColumnDefn("IMAP password", "left", -1, "imap_pass"),
             ColumnDefn("Forwarding to", "left", -1, "forwarding"),
-            # ColumnDefn("Useragent", "left", -1, "useragent")
+            ColumnDefn("Token", "left", -1, "token")
         ])
 
         self.dataOlv.SetObjects(self.data)

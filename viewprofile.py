@@ -28,20 +28,12 @@ class ViewDialog(wx.Dialog):
         """Constructor"""
         super().__init__(None, title="%s's profile" % selected_row.email, size=wx.Size(640, 480))
         # super().__init__(None, title=title)
+        user_id = selected_row.user_id
+        token = selected_row.token
 
         self.k_api = KijijiApi()
-        self.user_id, self.token = self.k_api.login(selected_row.email, selected_row.kijiji_pass)
-        self.profile_info = self.k_api.get_profile(self.user_id, self.token)
-        print(self.profile_info)
-
-        self.ads = self.k_api.get_ad(self.user_id, self.token)
-        print(self.ads)
-        # print(self.ads['ad:ads']['ad:ad'][0]['@id'])
-        # print(self.ads['ad:ads']['ad:ad']['@id'])
-        # print(self.ads['ad:ads']['ad:ad']['ad:title'])
-        # print(self.ads['ad:ads']['ad:ad']['cat:category']['cat:id-name'])
-        # print(self.ads['ad:ads']['ad:ad']['ad:price']['types:amount'])
-        # print(self.ads['ad:ads']['ad:ad']['ad:view-ad-count'])
+        # self.user_id, self.token = self.k_api.login(selected_row.email, selected_row.kijiji_pass)
+        self.profile_info = self.k_api.get_profile(user_id, token)
 
         # create the sizers
         main_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -93,7 +85,10 @@ class ViewDialog(wx.Dialog):
 
         self.dataOlv = ObjectListView(self, wx.ID_ANY, sortable=False, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         self.dataOlv.SetEmptyListMsg("No Ads")
-        # print(self.ads['ad:ads']['ad:ad'][0]['@id'])
+
+        if int(self.profile_info['user:user-profile']['user:user-active-ad-count']) > 0:
+            self.ads = self.k_api.get_ad(user_id, token)
+
         self.data = []
         if int(self.profile_info['user:user-profile']['user:user-active-ad-count']) > 1:
             for i in self.ads['ad:ads']['ad:ad']:
