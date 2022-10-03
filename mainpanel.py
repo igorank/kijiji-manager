@@ -35,6 +35,8 @@ class MainPanel(wx.Panel):
         self.dataOlv = ObjectListView(self, wx.ID_ANY, sortable=False, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         # self.dataOlv.SetEmptyListMsg("No Records Found")
         self.setData()
+        for i in range(7):
+            print(self.dataOlv.GetColumnWidth(i))
         # Allow the cell values to be edited when double/single-clicked
         # self.dataOlv.cellEditMode = ObjectListView.CELLEDIT_SINGLECLICK
         # self.dataOlv.cellEditMode = ObjectListView.CELLEDIT_DOUBLECLICK
@@ -74,6 +76,7 @@ class MainPanel(wx.Panel):
     def registerControl(self, event):
         with RegisterDialog() as dlg:
             dlg.ShowModal()
+            self.updateSpreadsheet()
 
     def deleteControl(self, event):
         selected_row = self.dataOlv.GetSelectedObject()
@@ -85,15 +88,7 @@ class MainPanel(wx.Panel):
         self.main_sheet.delete_row(cell.row)
 
         # Update
-        list_of_hashes = self.main_sheet.get_all_records()
-
-        self.data = []
-        for i in list_of_hashes:
-            self.data.append(
-                Account(i['User ID'], i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
-                        i['Forwarding to'], i['Token']))
-
-        self.dataOlv.SetObjects(self.data)
+        self.updateSpreadsheet()
 
         dialogs.show_message("Profile has been deleted!", 'Deleted', wx.ICON_INFORMATION)
 
@@ -124,6 +119,10 @@ class MainPanel(wx.Panel):
         # self.show_all_records()
 
     def updateControl(self, event):
+        self.updateSpreadsheet()
+        dialogs.show_message("The spreadsheet has been updated!", 'Updated', wx.ICON_INFORMATION)
+
+    def updateSpreadsheet(self):
         list_of_hashes = self.main_sheet.get_all_records()
 
         self.data = []
@@ -134,17 +133,15 @@ class MainPanel(wx.Panel):
 
         self.dataOlv.SetObjects(self.data)
 
-        dialogs.show_message("The spreadsheet has been updated!", 'Updated', wx.ICON_INFORMATION)
-
     def setData(self):
         self.dataOlv.SetColumns([
-            ColumnDefn("User ID", "left", -1, "user_id"),
-            ColumnDefn("Email", "left", -1, "email"),
-            ColumnDefn("Kijiji password", "left", -1, "kijiji_pass"),
-            ColumnDefn("Email Password", "left", -1, "email_pass"),
-            ColumnDefn("IMAP password", "left", -1, "imap_pass"),
-            ColumnDefn("Forwarding to", "left", -1, "forwarding"),
-            ColumnDefn("Token", "left", -1, "token")
+            ColumnDefn("User ID", "left", 70, "user_id", minimumWidth=70),
+            ColumnDefn("Email", "left", 213, "email", minimumWidth=213),
+            ColumnDefn("Kijiji password", "left", 89, "kijiji_pass", minimumWidth=89),
+            ColumnDefn("Email Password", "left", 116, "email_pass", minimumWidth=116),
+            ColumnDefn("IMAP password", "left", 88, "imap_pass", minimumWidth=88),
+            ColumnDefn("Forwarding to", "left", 211, "forwarding", minimumWidth=211),
+            ColumnDefn("Token", "left", 1783, "token", minimumWidth=1783)
         ])
 
         self.dataOlv.SetObjects(self.data)

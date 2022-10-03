@@ -64,13 +64,16 @@ class RegisterThread(Thread):
 
             kijiji_acc = Kijiji("chromedriver.exe")
             kijiji_dict = kijiji_acc.register(self.proxy, email_dict['email'], email_dict['imap_pass'])
-            print(kijiji_dict['cookies'])
+            # print(kijiji_dict['cookies'])
             #kijiji_dict = kijiji_acc.register(proxy, "dadadafoiafnoiafo@inbox.lv", "53653521")
             wx.CallAfter(pub.sendMessage, "update", msg="")
 
+            user_id, token = self.get_token(email_dict['email'], kijiji_dict['password'])
+
             ## Добавляем данные в таблицу
-            # Добавляем адр. почти в табл. (1 - стоблец с почт.)
             empty_email_row = gsheet.get_empty_row_in_col(self.main_sheet, 2)
+            self.main_sheet.update_cell(empty_email_row, 1, user_id)
+            # Добавляем адр. почти в табл. (1 - стоблец с почт.)
             self.main_sheet.update_cell(empty_email_row, 2, email_dict['email'])
             # Добавляем пароль от kijiji в табл. (2 - стоблец с пар. от почты)
             self.main_sheet.update_cell(empty_email_row, 3, kijiji_dict['password'])
@@ -83,25 +86,27 @@ class RegisterThread(Thread):
             # Добавляем UserAgent в табл. (6 - стоблец с пар. от почты)
             self.main_sheet.update_cell(empty_email_row, 7, email_dict['useragent'])
             wx.CallAfter(pub.sendMessage, "update", msg="")
-            it = 0
-            while True:
-                if it > 2:
-                    IPChanger.change_ip(self.proxy.get_change_ip_url())  # меняем IP
-                    it = 0
-                try:
-                    user_id, token = self.k_api.login(email_dict['email'], kijiji_dict['password'])
-                    break
-                except:
-                    time.sleep(5)
-                    it += 1
             wx.CallAfter(pub.sendMessage, "update", msg="")
-            self.main_sheet.update_cell(empty_email_row, 1, user_id)
             self.main_sheet.update_cell(empty_email_row, 8, token)
             wx.CallAfter(pub.sendMessage, "update", msg="")
 
             i += 1
             wx.CallAfter(pub.sendMessage, "update", msg="")
         wx.PostEvent(self._notify_window, ResultEvent("Done"))
+
+    def get_token(self, email, password):
+        it = 0
+        while True:
+            if it > 2:
+                IPChanger.change_ip(self.proxy.get_change_ip_url())  # меняем IP
+                it = 0
+            try:
+                user_id, token = self.k_api.login(email, password)
+                break
+            except:
+                time.sleep(5)
+                it += 1
+        return user_id, token
 
     def abort(self):
         """abort worker thread."""

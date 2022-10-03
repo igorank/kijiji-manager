@@ -2,14 +2,13 @@ from xml.parsers.expat import ExpatError, errors
 from httpx_socks import SyncProxyTransport
 import httpx
 import xmltodict
-from singletonmeta import SingletonMeta
 
 
 class KijijiApiException(Exception):
     """KijijiApi class exception"""
 
 
-class KijijiApi(metaclass=SingletonMeta):
+class KijijiApi:
     """API for interfacing with Kijiji site
     This class is stateless and does not manage user logins on its own.
     Must login first to use methods that require a user ID and token.

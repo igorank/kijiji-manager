@@ -39,25 +39,22 @@ class Kijiji(Driver):
         driver = self.setup_driver(proxy=proxy, undetected=True, twocaptcha_ext=False, headless=False)
         print('Done.')
 
-        driver.get("https://www.kijiji.ca/")
+        driver.get("https://www.kijiji.ca/t-user-registration.html")
         # WebDriverWait(driver, 20).until(
         #     EC.presence_of_element_located((By.XPATH,
         #                                     '//*[@id="MainContainer"]/div[1]/div/div[2]/div/header/div[3]/div/div[3]/div/div/div/a[1]')))
         while True:
             try:
                 WebDriverWait(driver, 20).until(
-                    EC.presence_of_element_located((By.XPATH,
-                                                    '//a[@title="Register"]')))
+                    EC.presence_of_element_located((By.XPATH, '//*[@id="profileName"]')))
                 break
             except:
                 driver.refresh()
-        # driver.find_element(By.XPATH, '//*[@id="MainContainer"]/div[1]/div/div[2]/div/header/div[3]/div/div['
-        #                               '3]/div/div/div/a[1]').click()
-        driver.find_element(By.XPATH, '//a[@title="Register"]').click()
+        # driver.find_element(By.XPATH, '//a[@title="Register"]').click()
 
         name = random.choice(self.names)
-        WebDriverWait(driver, 20).until(
-            EC.presence_of_element_located((By.XPATH, '//*[@id="profileName"]')))
+        # WebDriverWait(driver, 20).until(
+        #     EC.presence_of_element_located((By.XPATH, '//*[@id="profileName"]')))
         driver.find_element(By.XPATH, '//*[@id="profileName"]').send_keys(
             name)
 
@@ -78,14 +75,14 @@ class Kijiji(Driver):
 
         mail_reader = EmailReader("mail.inbox.lv", email, imap_pass)
         verf_link = mail_reader.get_verf_link(120)
-        print(verf_link)
+        # print(verf_link)
         cookies = get_cookies(driver)
         data['cookies'] = cookies
         driver.get(verf_link)
         driver.close()
         driver.quit()
 
-        IPChanger.change_ip(proxy.get_change_ip_url()) # меняем IP
+        # IPChanger.change_ip(proxy.get_change_ip_url()) # меняем IP
 
         return data
 

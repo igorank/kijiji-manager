@@ -32,7 +32,6 @@ class ViewDialog(wx.Dialog):
         token = selected_row.token
 
         self.k_api = KijijiApi()
-        # self.user_id, self.token = self.k_api.login(selected_row.email, selected_row.kijiji_pass)
         self.profile_info = self.k_api.get_profile(user_id, token)
 
         # create the sizers
@@ -134,11 +133,11 @@ class ViewDialog(wx.Dialog):
 
     def setData(self):
         self.dataOlv.SetColumns([
-            ColumnDefn("Ad ID", "left", -1, "ad_id"),
-            ColumnDefn("Title", "left", -1, "title"),
-            ColumnDefn("Category", "left", -1, "category"),
-            ColumnDefn("Price", "left", -1, "price", minimumWidth=45),
-            ColumnDefn("Views", "left", -1, "views", minimumWidth=45),
-            ColumnDefn("Created", "left", -1, "start_date"),
-            ColumnDefn("Expires", "left", -1, "end_date"),
+            ColumnDefn("Ad ID", "left", 70, "ad_id", minimumWidth=70),
+            ColumnDefn("Title", "left", 128, "title", minimumWidth=128),
+            ColumnDefn("Category", "left", 124, "category", minimumWidth=124),
+            ColumnDefn("Price", "left", 45, "price", minimumWidth=45),
+            ColumnDefn("Views", "left", 45, "views", minimumWidth=45),
+            ColumnDefn("Created", "left", 117, "start_date", minimumWidth=117),
+            ColumnDefn("Expires", "left", 117, "end_date", minimumWidth=117),
         ])
