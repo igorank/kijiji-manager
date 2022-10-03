@@ -20,6 +20,7 @@ def dateConverter(string):
     x = string.split("T")
     return x[0] + ' ' + x[1][:8]
 
+
 class ViewDialog(wx.Dialog):
 
     # def __init__(self, selected_row, title="Profile"):
@@ -35,7 +36,7 @@ class ViewDialog(wx.Dialog):
 
         self.ads = self.k_api.get_ad(self.user_id, self.token)
         print(self.ads)
-        print(self.ads['ad:ads']['ad:ad'][0]['@id'])
+        # print(self.ads['ad:ads']['ad:ad'][0]['@id'])
         # print(self.ads['ad:ads']['ad:ad']['@id'])
         # print(self.ads['ad:ads']['ad:ad']['ad:title'])
         # print(self.ads['ad:ads']['ad:ad']['cat:category']['cat:id-name'])
@@ -75,7 +76,7 @@ class ViewDialog(wx.Dialog):
         self.name.SetFont(font_2)
         name_sizer = row_builder([name_lbl, self.name])
 
-        activeads_num_lbl = wx.StaticText(self, label="Active ADs :")
+        activeads_num_lbl = wx.StaticText(self, label="Active Ads :")
         activeads_num_lbl.SetFont(font)
         self.ads_num = wx.StaticText(self, label=self.profile_info['user:user-profile']['user:user-active-ad-count'])
         self.ads_num.SetFont(font_2)
@@ -91,28 +92,26 @@ class ViewDialog(wx.Dialog):
         main_sizer.Add(row_builder([email_lbl, self.email]), 0, wx.ALL)
 
         self.dataOlv = ObjectListView(self, wx.ID_ANY, sortable=False, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
-
+        self.dataOlv.SetEmptyListMsg("No Ads")
         # print(self.ads['ad:ads']['ad:ad'][0]['@id'])
-
         self.data = []
-        for i in self.ads['ad:ads']['ad:ad']:
-            self.data.append(AD(i['@id'], i['ad:title'],
-                                i['cat:category']['cat:id-name'],
-                                i['ad:price']['types:amount'],
-                                i['ad:view-ad-count'],
-                                # i['ad:start-date-time'][:10],
-                                dateConverter(i['ad:start-date-time']),
-                                # i['ad:end-date-time'][:10]))
-                                dateConverter(i['ad:end-date-time'])))
-
-        # Если одна реклама
-        # self.data.append(AD(self.ads['ad:ads']['ad:ad']['@id'], self.ads['ad:ads']['ad:ad']['ad:title'],
-        #                     self.ads['ad:ads']['ad:ad']['cat:category']['cat:id-name'],
-        #                     self.ads['ad:ads']['ad:ad']['ad:price']['types:amount'],
-        #                     self.ads['ad:ads']['ad:ad']['ad:view-ad-count']))
-
+        if int(self.profile_info['user:user-profile']['user:user-active-ad-count']) > 1:
+            for i in self.ads['ad:ads']['ad:ad']:
+                self.data.append(AD(i['@id'], i['ad:title'],
+                                    i['cat:category']['cat:id-name'],
+                                    i['ad:price']['types:amount'],
+                                    i['ad:view-ad-count'],
+                                    dateConverter(i['ad:start-date-time']),
+                                    dateConverter(i['ad:end-date-time'])))
+        elif int(self.profile_info['user:user-profile']['user:user-active-ad-count']) == 1:
+            # Если одна реклама
+            self.data.append(AD(self.ads['ad:ads']['ad:ad']['@id'], self.ads['ad:ads']['ad:ad']['ad:title'],
+                                self.ads['ad:ads']['ad:ad']['cat:category']['cat:id-name'],
+                                self.ads['ad:ads']['ad:ad']['ad:price']['types:amount'],
+                                self.ads['ad:ads']['ad:ad']['ad:view-ad-count'],
+                                dateConverter(self.ads['ad:ads']['ad:ad']['ad:start-date-time']),
+                                dateConverter(self.ads['ad:ads']['ad:ad']['ad:end-date-time'])))
         self.dataOlv.SetObjects(self.data)
-
         self.setData()
 
         post_ad_btn = wx.Button(self, label="Post Ad")
@@ -143,8 +142,8 @@ class ViewDialog(wx.Dialog):
             ColumnDefn("Ad ID", "left", -1, "ad_id"),
             ColumnDefn("Title", "left", -1, "title"),
             ColumnDefn("Category", "left", -1, "category"),
-            ColumnDefn("Price", "left", -1, "price"),
-            ColumnDefn("Views", "left", 45, "views"),
+            ColumnDefn("Price", "left", -1, "price", minimumWidth=45),
+            ColumnDefn("Views", "left", -1, "views", minimumWidth=45),
             ColumnDefn("Created", "left", -1, "start_date"),
             ColumnDefn("Expires", "left", -1, "end_date"),
         ])
