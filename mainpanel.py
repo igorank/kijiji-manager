@@ -1,5 +1,5 @@
 import wx
-import dialogs
+import helper
 from viewprofile import ViewDialog
 from registerdialog import RegisterDialog
 from ObjectListView import ObjectListView, ColumnDefn

@@ -2,7 +2,7 @@ import time
 
 import wx
 import resultevent
-from dialogs import row_builder, show_message
+from helper import row_builder, show_message
 from registerthread import RegisterThread
 from wx.lib.pubsub import pub
 

@@ -1,7 +1,7 @@
 import wx
-from dialogs import show_message
+from helper import show_message
 from kijiji_api import KijijiApi
-from dialogs import row_builder
+from helper import row_builder
 from ObjectListView import ObjectListView, ColumnDefn
 
 
