@@ -138,6 +138,33 @@ class KijijiApi:
         else:
             raise KijijiApiException(self._error_reason(self._parse_response(r.text)))
 
+    def post_ad(self, user_id, token, data):
+        """Post new ad
+        No input validation is performed; incorrect inputs are expected to be reported back by Kijiji API after attempting to post
+        :param user_id: user ID number
+        :param token: session token
+        :param data: ad xml data
+        :return: new ad ID number
+        """
+        headers = self._headers_with_auth(user_id, token)
+        headers.update({'Content-Type': 'application/xml'})
+
+        # Expects data to be in correct XML format
+        xml = data
+
+        r = self.session.post(f'{self.base_url}/users/{user_id}/ads', headers=headers, data=xml)
+
+        doc = self._parse_response(r.text)
+
+        if r.status_code == 201:
+            try:
+                ad_id = doc['ad:ad']['@id']
+            except KeyError as e:
+                raise KijijiApiException(f"User ID and/or user token not found in response text: {e}")
+            return ad_id
+        else:
+            raise KijijiApiException(self._error_reason(doc))
+
     @staticmethod
     def _headers_with_auth(user_id, token):
         return {'X-ECG-Authorization-User': f'id="{user_id}", token="{token}"'}

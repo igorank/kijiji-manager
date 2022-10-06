@@ -2,6 +2,7 @@ import wx
 from helper import show_message
 from kijiji_api import KijijiApi
 from helper import row_builder
+from postad import PostAdDialog
 from ObjectListView import ObjectListView, ColumnDefn
 
 
@@ -122,15 +123,8 @@ class ViewDialog(wx.Dialog):
         self.updateSpreadsheet()
 
     def on_post(self, event):
-        """
-        Edit a record in the database
-        """
-        # author_dict, book_dict = self.get_data()
-        # combo_dict = {**author_dict, **book_dict}
-        # # controller.edit_record(self.session, self.selected_row.id, combo_dict)
-        # show_message("Book Edited Successfully!", "Success",
-        #              wx.ICON_INFORMATION)
-        self.Close()
+        with PostAdDialog(self.k_api, self.user_id, self.token) as dlg:
+            dlg.ShowModal()
 
     def updateSpreadsheet(self):
         ads = self.k_api.get_ad(self.user_id, self.token)
