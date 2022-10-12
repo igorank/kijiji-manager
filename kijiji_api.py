@@ -2,6 +2,7 @@ from xml.parsers.expat import ExpatError, errors
 from httpx_socks import SyncProxyTransport
 import httpx
 import xmltodict
+import pgeocode
 
 
 class KijijiApiException(Exception):
@@ -155,6 +156,18 @@ class KijijiApi:
             return doc
         else:
             raise KijijiApiException(self._error_reason(doc))
+
+    @staticmethod
+    def geo_location(postal_code):
+        # pgeocode.Nominatim.query_postal_code only uses the first three characters to do the lookup for Canadian postal codes
+        postalcode = postal_code[:3]
+        try:
+            nomi = pgeocode.Nominatim('ca')
+            location = nomi.query_postal_code(postalcode)
+        except Exception as e:
+            raise KijijiApiException(f'Error acquiring geo location data: {e}')
+        else:
+            return location
 
     def delete_ad(self, user_id, token, ad_id):
         """Delete ad

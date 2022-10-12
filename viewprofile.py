@@ -32,6 +32,7 @@ class ViewDialog(wx.Dialog):
         super().__init__(None, title="%s's profile" % selected_row.email, size=wx.Size(640, 480))
         # super().__init__(None, title=title)
         self.user_id = selected_row.user_id
+        self.email = selected_row.email
         self.token = selected_row.token
         proxy = Proxy(username="Th9skxds1GOpDHjq", password="mobile;ca;", host="proxy.soax.com", port="9298",
                            url=" ")  # TEST
@@ -126,7 +127,7 @@ class ViewDialog(wx.Dialog):
         self.updateSpreadsheet()
 
     def on_post(self, event):
-        with PostAdDialog(self.k_api, self.user_id, self.token) as dlg:
+        with PostAdDialog(self.k_api, self.user_id, self.email, self.token) as dlg:
             dlg.ShowModal()
 
     def updateSpreadsheet(self):
