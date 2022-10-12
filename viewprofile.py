@@ -1,4 +1,5 @@
 import wx
+from proxy import Proxy
 from helper import show_message
 from kijiji_api import KijijiApi
 from helper import row_builder
@@ -32,7 +33,9 @@ class ViewDialog(wx.Dialog):
         # super().__init__(None, title=title)
         self.user_id = selected_row.user_id
         self.token = selected_row.token
-        self.k_api = KijijiApi()
+        proxy = Proxy(username="Th9skxds1GOpDHjq", password="mobile;ca;", host="proxy.soax.com", port="9298",
+                           url=" ")  # TEST
+        self.k_api = KijijiApi(proxy=proxy)
         self.profile_info = self.k_api.get_profile(self.user_id, self.token)
 
         # create the sizers
@@ -128,6 +131,7 @@ class ViewDialog(wx.Dialog):
 
     def updateSpreadsheet(self):
         ads = self.k_api.get_ad(self.user_id, self.token)
+        # print(ads) # TEMP
 
         data = []
         if 'ad:ad' in ads['ad:ads']:

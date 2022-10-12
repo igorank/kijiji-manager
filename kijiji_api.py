@@ -122,6 +122,40 @@ class KijijiApi:
         else:
             raise KijijiApiException(self._error_reason(doc))
 
+    def get_categories(self, user_id, token):
+        """Get all categories metadata
+        :param user_id: user ID number
+        :param token: session token
+        :return: response data dict
+        """
+        headers = self._headers_with_auth(user_id, token)
+
+        r = self.session.get(f'{self.base_url}/categories', headers=headers)
+
+        doc = self._parse_response(r.text)
+
+        if r.status_code == 200:
+            return doc
+        else:
+            raise KijijiApiException(self._error_reason(doc))
+
+    def get_locations(self, user_id, token):
+        """Get all locations metadata
+        :param user_id: user ID number
+        :param token: session token
+        :return: response data dict
+        """
+        headers = self._headers_with_auth(user_id, token)
+
+        r = self.session.get(f'{self.base_url}/locations', headers=headers)
+
+        doc = self._parse_response(r.text)
+
+        if r.status_code == 200:
+            return doc
+        else:
+            raise KijijiApiException(self._error_reason(doc))
+
     def delete_ad(self, user_id, token, ad_id):
         """Delete ad
         :param user_id: user ID number
