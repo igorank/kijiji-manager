@@ -104,6 +104,9 @@ class PostAdDialog(wx.Dialog):
 
     def post(self, event):
 
+        zip_code = self.zip_code.GetValue()
+        location = self.kijiji_api.geo_location(zip_code)
+
         payload = {
             'ad:ad': {
                 '@xmlns:ad': 'http://www.ebayclassifiedsgroup.com/schema/ad/v1',
@@ -129,10 +132,10 @@ class PostAdDialog(wx.Dialog):
                 'ad:phone': None,
                 'ad:ad-address': {
                     'types:radius': 400,
-                    'types:latitude': '42.5814',
-                    'types:longitude': '-80.39912',
-                    'types:full-address': 'Norfolk County Hwy 59, Port Rowan, ON N0E 1M0',
-                    'types:zip-code': 'N0E 1M0',
+                    'types:latitude': str(location.latitude),
+                    'types:longitude': str(location.longitude),
+                    'types:full-address': self.fulladdress.GetValue(),
+                    'types:zip-code': zip_code,
                 },
                 'ad:visible-on-map': 'true',  # appears to make no difference if set to 'true' or 'false'
                 'attr:attributes': {'attr:attribute': [{'@localized-label': 'For Sale By', '@type': 'ENUM', '@accessibility-feature': 'false', '@name': 'forsaleby', 'attr:value': {'@localized-label': 'Owner', '#text': 'ownr'}}, {'@localized-label': 'Condition', '@type': 'ENUM', '@accessibility-feature': 'false', '@name': 'condition', 'attr:value': {'@localized-label': 'Used - Like new', '#text': 'usedlikenew'}}]},
