@@ -118,6 +118,8 @@ class PostAdDialog(wx.Dialog):
         # print(locations)
         # print(self.locs_to_strings(locations))
 
+        print(self.get_location_id())
+
         zip_code = self.zip_code.GetValue()
         location = self.kijiji_api.geo_location(zip_code)
 
@@ -134,7 +136,7 @@ class PostAdDialog(wx.Dialog):
                 '@xmlns:feature': 'http://www.ebayclassifiedsgroup.com/schema/feature/v1',
                 '@id': '',
                 'cat:category': {'@id': self.get_category_id()},
-                'loc:locations': {'loc:location': {'@id': '1700248'}},
+                'loc:locations': {'loc:location': {'@id': self.get_location_id()}},
                 'ad:ad-type': {'ad:value': 'OFFERED'},
                 'ad:title': self.title.GetValue(),
                 'ad:description': self.description.GetValue(),
@@ -190,6 +192,22 @@ class PostAdDialog(wx.Dialog):
                 if i['cat:id-name'] == id_name:
                     res = i
                     break
+            return res['@id']
+
+    def get_location_id(self):
+        id_name = self.locations_list.GetString(self.locations_list.GetCurrentSelection())
+        locs = id_name.split(',')
+        count = id_name.count(',')
+        res = None
+        if count >= 2:
+            for i in self.locations['loc:locations']['loc:location']['loc:location']:
+                if i['loc:localized-name'] == locs[0]:
+                    for j in i['loc:location']:
+                        if j['loc:localized-name'] == locs[1][1:]:
+                            for k in j['loc:location']:
+                                if k['loc:localized-name'] == locs[2][1:]:
+                                    res = k
+                                    break
             return res['@id']
 
     def update_subcategories(self, event):
