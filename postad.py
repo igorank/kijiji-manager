@@ -41,7 +41,7 @@ class PostAdDialog(wx.Dialog):
 
         title_lbl = wx.StaticText(self, label="Title :")
         title_lbl.SetFont(font)
-        self.title = wx.TextCtrl(self, value="", size=(250, -1))
+        self.title = wx.TextCtrl(self, value="", size=(400, -1))
         main_sizer.Add(row_builder([title_lbl, self.title]))
 
         # create some text
@@ -78,8 +78,14 @@ class PostAdDialog(wx.Dialog):
 
         description_lbl = wx.StaticText(self, label="Description :")
         description_lbl.SetFont(font)
-        self.description = wx.TextCtrl(self, value="", size=(250, 150), style=wx.TE_MULTILINE)
+        self.description = wx.TextCtrl(self, value="", size=(400, 150), style=wx.TE_MULTILINE)
         main_sizer.Add(row_builder([description_lbl, self.description]))
+
+        photo_folder_lbl = wx.StaticText(self, label="Folder with Images :")
+        photo_folder_lbl.SetFont(font)
+        self.photo_folder = wx.DirPickerCtrl(self, id=wx.ID_ANY, path="",
+              message="Choose input directory", style=wx.DIRP_DEFAULT_STYLE, size=(400, -1))
+        main_sizer.Add(row_builder([photo_folder_lbl, self.photo_folder]))
 
         locations_lbl = wx.StaticText(self, label="Location :")
         locations_lbl.SetFont(font)
@@ -90,7 +96,7 @@ class PostAdDialog(wx.Dialog):
 
         fulladdress_lbl = wx.StaticText(self, label="Full Address :")
         fulladdress_lbl.SetFont(font)
-        self.fulladdress = wx.TextCtrl(self, value="", size=(200, -1))
+        self.fulladdress = wx.TextCtrl(self, value="", size=(400, -1))
         main_sizer.Add(row_builder([fulladdress_lbl, self.fulladdress]))
 
         zip_code_lbl = wx.StaticText(self, label="Zip-code :")
@@ -117,8 +123,6 @@ class PostAdDialog(wx.Dialog):
         # locations = self.get_sub_locations()
         # print(locations)
         # print(self.locs_to_strings(locations))
-
-        print(self.get_location_id())
 
         zip_code = self.zip_code.GetValue()
         location = self.kijiji_api.geo_location(zip_code)
