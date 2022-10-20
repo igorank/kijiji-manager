@@ -199,16 +199,20 @@ class PostAdDialog(wx.Dialog):
         locs = id_name.split(',')
         count = id_name.count(',')
         res = None
-        if count >= 2:
-            for i in self.locations['loc:locations']['loc:location']['loc:location']:
-                if i['loc:localized-name'] == locs[0]:
-                    for j in i['loc:location']:
-                        if j['loc:localized-name'] == locs[1][1:]:
+        # if count >= 2:
+        for i in self.locations['loc:locations']['loc:location']['loc:location']:
+            if i['loc:localized-name'] == locs[0]:
+                for j in i['loc:location']:
+                    if j['loc:localized-name'] == locs[1][1:]:
+                        if count >= 2:
                             for k in j['loc:location']:
                                 if k['loc:localized-name'] == locs[2][1:]:
                                     res = k
                                     break
-            return res['@id']
+                        else:
+                            res = j
+                            break
+        return res['@id']
 
     def update_subcategories(self, event):
         print(1)
