@@ -9,11 +9,12 @@ class PostAdDialog(wx.Dialog):
 
     def __init__(self, kijiji_api, user_id, email, user_token):
         """Constructor"""
-        super().__init__(None, title="Post Ad", size=wx.Size(320, 480))
+        super().__init__(None, title="Post Ad", size=wx.Size(480, 640))
         self.kijiji_api = kijiji_api
         self.user_id = user_id
         self.email = email
         self.user_token = user_token
+        self.locations = self.kijiji_api.get_locations(self.user_id, self.user_token)
 
         # Категории
         self.cats = kijiji_api.get_categories(user_id, user_token)
@@ -80,6 +81,12 @@ class PostAdDialog(wx.Dialog):
         self.description = wx.TextCtrl(self, value="", size=(250, 150), style=wx.TE_MULTILINE)
         main_sizer.Add(row_builder([description_lbl, self.description]))
 
+        locations_lbl = wx.StaticText(self, label="Location :")
+        locations_lbl.SetFont(font)
+        self.locations_list = wx.ComboBox(self, wx.ID_ANY, size=(200, -1), style=wx.CB_READONLY,
+                                          choices=self.get_main_locations())
+        main_sizer.Add(row_builder([locations_lbl, self.locations_list]))
+
         fulladdress_lbl = wx.StaticText(self, label="Full Address :")
         fulladdress_lbl.SetFont(font)
         self.fulladdress = wx.TextCtrl(self, value="", size=(200, -1))
@@ -103,6 +110,10 @@ class PostAdDialog(wx.Dialog):
         self.SetSizer(main_sizer)
 
     def post(self, event):
+
+        #print(self.locations['loc:locations']['loc:location']['loc:location'])
+        #print(type(self.locations['loc:locations']['loc:location']['loc:location']))
+        print(self.get_sub_locations())
 
         zip_code = self.zip_code.GetValue()
         location = self.kijiji_api.geo_location(zip_code)
@@ -217,3 +228,36 @@ class PostAdDialog(wx.Dialog):
             subcategories.append(i['cat:id-name'])
         #print(subcategories)
         return subcategories
+
+    def get_main_locations(self) -> list:
+        locs = []
+        for i in self.locations['loc:locations']['loc:location']['loc:location']:
+            locs.append(i['loc:localized-name'])
+        return locs
+
+    def get_sub_locations(self) -> dict:
+        states = self.get_main_locations()
+        locs = {}
+        for i in states:
+            locs[i] = []
+        keys = list(locs)
+        # print(locs)
+        for i in range(len(keys)):
+            for j in self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:location']:
+                if type(j) is dict:
+                    if 'loc:location' not in j:
+                        locs[keys[int(i)]].append(j['loc:localized-name'])
+                    else:
+                        sub_locs = {}
+                        sub_locs[j['loc:localized-name']] = []
+                        for k in j['loc:location']:
+                            if type(k) is dict:
+                            # print(k['loc:localized-name']) # class str
+                                sub_locs[j['loc:localized-name']].append(k['loc:localized-name'])
+                            else:
+                                print(k)
+                                print(type(k))
+                        # print(sub_locs)
+                        locs[keys[int(i)]].append(sub_locs)
+                        # print(locs)
+        return locs
