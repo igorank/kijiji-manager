@@ -15,7 +15,7 @@ class PostAdDialog(wx.Dialog):
         self.email = email
         self.user_token = user_token
         self.locations = self.kijiji_api.get_locations(self.user_id, self.user_token)
-
+        sub_locations = self.get_sub_locations()
         # Категории
         self.cats = kijiji_api.get_categories(user_id, user_token)
         # print(cats['cat:categories']['cat:category']['cat:category'][0]['cat:category'])
@@ -83,8 +83,9 @@ class PostAdDialog(wx.Dialog):
 
         locations_lbl = wx.StaticText(self, label="Location :")
         locations_lbl.SetFont(font)
-        self.locations_list = wx.ComboBox(self, wx.ID_ANY, size=(200, -1), style=wx.CB_READONLY,
-                                          choices=self.get_main_locations())
+        self.locations_list = wx.ComboBox(self, wx.ID_ANY, size=(400, -1), style=wx.CB_READONLY,
+                                          choices=self.locs_to_strings(sub_locations))
+        self.locations_list.SetSelection(0)
         main_sizer.Add(row_builder([locations_lbl, self.locations_list]))
 
         fulladdress_lbl = wx.StaticText(self, label="Full Address :")
@@ -113,7 +114,9 @@ class PostAdDialog(wx.Dialog):
 
         #print(self.locations['loc:locations']['loc:location']['loc:location'])
         #print(type(self.locations['loc:locations']['loc:location']['loc:location']))
-        print(self.get_sub_locations())
+        # locations = self.get_sub_locations()
+        # print(locations)
+        # print(self.locs_to_strings(locations))
 
         zip_code = self.zip_code.GetValue()
         location = self.kijiji_api.geo_location(zip_code)
@@ -235,6 +238,23 @@ class PostAdDialog(wx.Dialog):
             locs.append(i['loc:localized-name'])
         return locs
 
+    def locs_to_strings(self, sub_locs) -> list:
+        list_of_strings = []
+        for key, value in sub_locs.items():
+            for i, j in enumerate(value):
+                if type(j) is dict:
+                    for key2, value2 in j.items():
+                        for b in value2:
+                            #if len(b) > 1:
+                            list_of_strings.append(str(key) + ", " + key2 + ", " + b)
+                        #print(key2)
+                        #print(value2)
+                    #list_of_strings.append(str(key) + ", " + j[])
+                elif type(j) is str:
+                    list_of_strings.append(str(key) + ", " + j)
+
+        return list_of_strings
+
     def get_sub_locations(self) -> dict:
         states = self.get_main_locations()
         locs = {}
@@ -243,8 +263,36 @@ class PostAdDialog(wx.Dialog):
         keys = list(locs)
         # print(locs)
         for i in range(len(keys)):
-            for j in self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:location']:
+            for index, j in enumerate(self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:location']):
                 if type(j) is dict:
+                    if 'loc:location' not in j:
                         locs[keys[int(i)]].append(j['loc:localized-name'])
-            locs[keys[int(i)]].append(self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:localized-name'])
+                    else:
+                        sub_locs = {}
+                        sub_locs[j['loc:localized-name']] = []
+                        for index2, k in enumerate(j['loc:location']):
+                            if type(k) is dict:
+                                # print(k['loc:localized-name']) # class str
+                                sub_locs[j['loc:localized-name']].append(k['loc:localized-name'])
+                            # else:
+                            #     print(k)  # TEMP
+                            #     print(self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:location'][index])  # TEMP
+                            #     sub_locs[j['loc:localized-name']].append(self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:location'][index]['loc:location']['loc:localized-name'])
+                            #     print(type(self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:location'][index]['loc:location']['loc:localized-name']))
+                            # print(sub_locs)
+                        locs[keys[int(i)]].append(sub_locs)
+                        # sub_locs[j['loc:localized-name']].append(
+                        #     self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:location'][index][
+                        #         'loc:location']['loc:localized-name'])
+                        #print(self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:location'][index]['loc:location'])
+                        #print(sub_locs)
+            # locs[keys[int(i)]].append(self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:localized-name']) # Баг, который повторяет штаты
+
+        locs['Territories'][0]['Nunavut'] = ['Iqaluit']
+        locs['Territories'][1]['Northwest Territories'] = ['Yellowknife']
+        locs['Territories'][2]['Yukon'] = ['Whitehorse']
+
+        island_dict = {'Prince Edward Island': ['Charlottetown', 'Summerside']}
+        locs['Prince Edward Island'].append(island_dict)
+
         return locs
