@@ -245,19 +245,6 @@ class PostAdDialog(wx.Dialog):
         for i in range(len(keys)):
             for j in self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:location']:
                 if type(j) is dict:
-                    if 'loc:location' not in j:
                         locs[keys[int(i)]].append(j['loc:localized-name'])
-                    else:
-                        sub_locs = {}
-                        sub_locs[j['loc:localized-name']] = []
-                        for k in j['loc:location']:
-                            if type(k) is dict:
-                            # print(k['loc:localized-name']) # class str
-                                sub_locs[j['loc:localized-name']].append(k['loc:localized-name'])
-                            else:
-                                print(k)
-                                print(type(k))
-                        # print(sub_locs)
-                        locs[keys[int(i)]].append(sub_locs)
-                        # print(locs)
+            locs[keys[int(i)]].append(self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:localized-name'])
         return locs
