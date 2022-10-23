@@ -34,7 +34,7 @@ class ViewDialog(wx.Dialog):
         self.user_id = selected_row.user_id
         self.email = selected_row.email
         self.token = selected_row.token
-        proxy = Proxy(username="BZFXnHuP1VQmmNEO", password="mobile;ca;", host="proxy.soax.com", port="9298",
+        proxy = Proxy(username="BZFXnHuP1VQmmNEO", password="mobile;ca;", host="proxy.soax.com", port="9297",
                            url=" ")  # TEST
         self.k_api = KijijiApi(proxy=proxy)
         self.profile_info = self.k_api.get_profile(self.user_id, self.token)
@@ -86,9 +86,9 @@ class ViewDialog(wx.Dialog):
 
         email_lbl = wx.StaticText(self, label="Email :")
         email_lbl.SetFont(font)
-        self.email = wx.StaticText(self, label=self.profile_info['user:user-profile']['user:user-email'])
-        self.email.SetFont(font_2)
-        main_sizer.Add(row_builder([email_lbl, self.email]), 0, wx.ALL)
+        self.email_adr = wx.StaticText(self, label=self.profile_info['user:user-profile']['user:user-email'])
+        self.email_adr.SetFont(font_2)
+        main_sizer.Add(row_builder([email_lbl, self.email_adr]), 0, wx.ALL)
 
         self.dataOlv = ObjectListView(self, wx.ID_ANY, sortable=False, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         self.dataOlv.SetEmptyListMsg("No Ads")
@@ -132,7 +132,7 @@ class ViewDialog(wx.Dialog):
 
     def updateSpreadsheet(self):
         ads = self.k_api.get_ad(self.user_id, self.token)
-        # print(ads) # TEMP
+        print(ads) # TEMP
 
         data = []
         if 'ad:ad' in ads['ad:ads']:

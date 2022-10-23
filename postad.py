@@ -1,10 +1,20 @@
 import wx
+import os
 import base64
 import xmltodict
+from random import choice
 from helper import show_message
 from helper import row_builder
-from werkzeug.datastructures import FileStorage
 from kijiji_api import KijijiApiException
+
+
+# Добавить фильтр только для png jpg...
+def get_random_photo(path):
+    files = os.listdir(path)
+    files = [f for f in files if os.path.isfile(path + '/' + f)]  # Filtering only the files.
+    photo_name = choice(files)
+    photo_path = path + "\\" + photo_name
+    return photo_path, photo_name
 
 
 class PostAdDialog(wx.Dialog):
@@ -65,9 +75,9 @@ class PostAdDialog(wx.Dialog):
 
         categories_lbl = wx.StaticText(self, label="Category :")
         categories_lbl.SetFont(font)
-        self.categories_list = wx.ComboBox(self, wx.ID_ANY, size=(200, -1),  style=wx.CB_READONLY,
-                                              choices=self.get_categories(self.main_cats_list.GetCurrentSelection(),
-                                                                          self.subcategories_list.GetCurrentSelection()))
+        self.categories_list = wx.ComboBox(self, wx.ID_ANY, size=(200, -1), style=wx.CB_READONLY,
+                                           choices=self.get_categories(self.main_cats_list.GetCurrentSelection(),
+                                                                       self.subcategories_list.GetCurrentSelection()))
         if self.categories_list.GetCount() < 1:
             self.categories_list.Disable()
         else:
@@ -86,7 +96,8 @@ class PostAdDialog(wx.Dialog):
         photo_folder_lbl = wx.StaticText(self, label="Folder with Images :")
         photo_folder_lbl.SetFont(font)
         self.photo_folder = wx.DirPickerCtrl(self, id=wx.ID_ANY, path="",
-              message="Choose input directory", style=wx.DIRP_DEFAULT_STYLE, size=(400, -1))
+                                             message="Choose input directory", style=wx.DIRP_DEFAULT_STYLE,
+                                             size=(400, -1))
         main_sizer.Add(row_builder([photo_folder_lbl, self.photo_folder]))
 
         locations_lbl = wx.StaticText(self, label="Location :")
@@ -120,25 +131,20 @@ class PostAdDialog(wx.Dialog):
 
     def post(self, event):
 
-        #print(self.locations['loc:locations']['loc:location']['loc:location'])
-        #print(type(self.locations['loc:locations']['loc:location']['loc:location']))
+        # print(self.locations['loc:locations']['loc:location']['loc:location'])
+        # print(type(self.locations['loc:locations']['loc:location']['loc:location']))
         # locations = self.get_sub_locations()
         # print(locations)
         # print(self.locs_to_strings(locations))
 
-        with open("atomic_habits.png", "rb") as f:
+        photo_path, photo_filename = get_random_photo(self.photo_folder.GetPath())
+
+        with open(photo_path, "rb") as f:
             png_encoded = base64.b64encode(f.read())
 
-        print(type(png_encoded))
-        # print(png_encoded)
+        content_type = f'image/{photo_filename[-3:]}'
 
-        file_loc = open('atomic_habits.png', 'rb')
-        file = FileStorage(file_loc, content_type='image/png')
-        file.save(dst='atomic_habits2.png')
-
-        url = self.kijiji_api.upload_image(self.user_id, self.user_token, file.filename, png_encoded, file.content_type)
-        print(url)
-        file_loc.close()
+        # print(self.create_picture_payload(photo_filename, png_encoded, content_type))
 
         zip_code = self.zip_code.GetValue()
         location = self.kijiji_api.geo_location(zip_code)
@@ -170,12 +176,18 @@ class PostAdDialog(wx.Dialog):
                     'types:radius': 400,
                     'types:latitude': str(location.latitude),
                     'types:longitude': str(location.longitude),
-                    'types:full-address': self.fulladdress.GetValue(),
+                    'types:full-address': self.fulladdress.GetValue(), # 'Norfolk County Hwy 59, Port Rowan, ON N0E 1M0'
                     'types:zip-code': zip_code,
                 },
                 'ad:visible-on-map': 'true',  # appears to make no difference if set to 'true' or 'false'
-                'attr:attributes': {'attr:attribute': [{'@localized-label': 'For Sale By', '@type': 'ENUM', '@accessibility-feature': 'false', '@name': 'forsaleby', 'attr:value': {'@localized-label': 'Owner', '#text': 'ownr'}}, {'@localized-label': 'Condition', '@type': 'ENUM', '@accessibility-feature': 'false', '@name': 'condition', 'attr:value': {'@localized-label': 'Used - Like new', '#text': 'usedlikenew'}}]},
-                'pic:pictures': self.create_picture_payload(form.data),
+                'attr:attributes': {'attr:attribute': [
+                    {'@localized-label': 'For Sale By', '@type': 'ENUM', '@accessibility-feature': 'false',
+                     '@name': 'forsaleby', 'attr:value': {'@localized-label': 'Owner', '#text': 'ownr'}},
+                    {'@localized-label': 'Condition', '@type': 'ENUM', '@accessibility-feature': 'false',
+                     '@name': 'condition',
+                     'attr:value': {'@localized-label': 'Used - Like new', '#text': 'usedlikenew'}}]},
+                'pic:pictures': self.create_picture_payload(photo_filename, png_encoded, content_type),
+                # 'pic:pictures': None,
                 'vid:videos': None,
                 'ad:adSlots': None,
                 'ad:listing-tags': None,
@@ -186,21 +198,28 @@ class PostAdDialog(wx.Dialog):
         payload['ad:ad']['ad:price'].update({
             'types:amount': self.price.GetValue(),
             'types:currency-iso-code': {'types:value': 'CAD'},  # Assume Canadian dollars
-            })
+        })
+
+        print(payload)
+        print("\n")
 
         xml_payload = xmltodict.unparse(payload, short_empty_elements=True)
 
+        print(xml_payload)
+
         # Submit final payload
-        try:
-            print(self.kijiji_api.post_ad(self.user_id, self.user_token, xml_payload))
-        except KijijiApiException as exception:
-            show_message(str(exception), 'Error')
+        # try:
+        print(self.kijiji_api.post_ad(self.user_id, self.user_token, xml_payload))
+        # except KijijiApiException as exception:
+        # show_message(str(exception), 'Error')
 
     def get_category_id(self):
         if self.categories_list.IsEnabled():
             id_name = self.categories_list.GetString(self.categories_list.GetCurrentSelection())
             res = None
-            for i in self.cats['cat:categories']['cat:category']['cat:category'][self.main_cats_list.GetCurrentSelection()]['cat:category'][self.subcategories_list.GetCurrentSelection()]['cat:category']:
+            for i in \
+            self.cats['cat:categories']['cat:category']['cat:category'][self.main_cats_list.GetCurrentSelection()][
+                'cat:category'][self.subcategories_list.GetCurrentSelection()]['cat:category']:
                 if i['cat:id-name'] == id_name:
                     res = i
                     break
@@ -208,7 +227,9 @@ class PostAdDialog(wx.Dialog):
         else:
             id_name = self.subcategories_list.GetString(self.subcategories_list.GetCurrentSelection())
             res = None
-            for i in self.cats['cat:categories']['cat:category']['cat:category'][self.main_cats_list.GetCurrentSelection()]['cat:category']:
+            for i in \
+            self.cats['cat:categories']['cat:category']['cat:category'][self.main_cats_list.GetCurrentSelection()][
+                'cat:category']:
                 if i['cat:id-name'] == id_name:
                     res = i
                     break
@@ -257,7 +278,8 @@ class PostAdDialog(wx.Dialog):
         # print(self.cats['cat:categories']['cat:category']['cat:category'][index]['cat:category'][index2])
         if 'cat:category' in self.cats['cat:categories']['cat:category']['cat:category'][index]['cat:category'][index2]:
             categories = []
-            for i in self.cats['cat:categories']['cat:category']['cat:category'][index]['cat:category'][index2]['cat:category']:
+            for i in self.cats['cat:categories']['cat:category']['cat:category'][index]['cat:category'][index2][
+                'cat:category']:
                 categories.append(i['cat:id-name'])
             return categories
         else:
@@ -265,11 +287,11 @@ class PostAdDialog(wx.Dialog):
 
     def get_subcategories(self, index):
         subcategories = []
-        #subcategories = [{}]
+        # subcategories = [{}]
         for i in self.cats['cat:categories']['cat:category']['cat:category'][index]['cat:category']:
-            #subcategories.append({'id': i['@id'], 'name': i['cat:id-name']})
+            # subcategories.append({'id': i['@id'], 'name': i['cat:id-name']})
             subcategories.append(i['cat:id-name'])
-        #print(subcategories)
+        # print(subcategories)
         return subcategories
 
     def get_main_locations(self) -> list:
@@ -285,11 +307,11 @@ class PostAdDialog(wx.Dialog):
                 if type(j) is dict:
                     for key2, value2 in j.items():
                         for b in value2:
-                            #if len(b) > 1:
+                            # if len(b) > 1:
                             list_of_strings.append(str(key) + ", " + key2 + ", " + b)
-                        #print(key2)
-                        #print(value2)
-                    #list_of_strings.append(str(key) + ", " + j[])
+                        # print(key2)
+                        # print(value2)
+                    # list_of_strings.append(str(key) + ", " + j[])
                 elif type(j) is str:
                     list_of_strings.append(str(key) + ", " + j)
 
@@ -303,7 +325,8 @@ class PostAdDialog(wx.Dialog):
         keys = list(locs)
         # print(locs)
         for i in range(len(keys)):
-            for index, j in enumerate(self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:location']):
+            for index, j in enumerate(
+                    self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:location']):
                 if type(j) is dict:
                     if 'loc:location' not in j:
                         locs[keys[int(i)]].append(j['loc:localized-name'])
@@ -324,8 +347,8 @@ class PostAdDialog(wx.Dialog):
                         # sub_locs[j['loc:localized-name']].append(
                         #     self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:location'][index][
                         #         'loc:location']['loc:localized-name'])
-                        #print(self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:location'][index]['loc:location'])
-                        #print(sub_locs)
+                        # print(self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:location'][index]['loc:location'])
+                        # print(sub_locs)
             # locs[keys[int(i)]].append(self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:localized-name']) # Баг, который повторяет штаты
 
         locs['Territories'][0]['Nunavut'] = ['Iqaluit']
@@ -337,7 +360,7 @@ class PostAdDialog(wx.Dialog):
 
         return locs
 
-    def create_picture_payload(self, data):
+    def create_picture_payload(self, photo_filename, png_encoded, content_type):
         """Build picture payload dict from file* fields."""
         payload = {'pic:picture': []}
 
@@ -349,18 +372,16 @@ class PostAdDialog(wx.Dialog):
             'thumbnail': 64,
         }
 
-        for key, value in data.items():
-            if key.startswith('file') and value:
-                link = self.kijiji_api.upload_image(self.user_id, self.user_token, value)
+        link = self.kijiji_api.upload_image(self.user_id, self.user_token, photo_filename, png_encoded, content_type)
 
-                # Add a separate link for each image size
-                links = []
-                for size_name, size_px in image_sizes.items():
-                    links.append({
-                        '@rel': size_name,
-                        '@href': f'{link}?rule=kijijica-{size_px}-jpg',
-                    })
+        # Add a separate link for each image size
+        links = []
+        for size_name, size_px in image_sizes.items():
+            links.append({
+                '@rel': size_name,
+                '@href': f'{link}?rule=kijijica-{size_px}-jpg',
+            })
 
-                payload['pic:picture'].append({'pic:link': links})
+        payload['pic:picture'].append({'pic:link': links})
 
         return payload if len(payload['pic:picture']) else {}

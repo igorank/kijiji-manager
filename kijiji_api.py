@@ -243,11 +243,6 @@ class KijijiApi:
             'file': (filename, stream, content_type),
         }
 
-        #TEMP
-        print(stream)
-        print(filename)
-        print(content_type)
-
         r = self.session.post(api_endpoint, headers=headers, files=files)
 
         # Response is in JSON format
