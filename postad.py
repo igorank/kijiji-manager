@@ -54,6 +54,7 @@ class PostAdDialog(wx.Dialog):
         title_lbl = wx.StaticText(self, label="Title :")
         title_lbl.SetFont(font)
         self.title = wx.TextCtrl(self, value="", size=(400, -1))
+        self.title.SetMaxLength(64)
         main_sizer.Add(row_builder([title_lbl, self.title]))
 
         # create some text
@@ -140,11 +141,11 @@ class PostAdDialog(wx.Dialog):
         photo_path, photo_filename = get_random_photo(self.photo_folder.GetPath())
 
         with open(photo_path, "rb") as f:
-            png_encoded = base64.b64encode(f.read())
+            png_encoded = f.read()
 
         content_type = f'image/{photo_filename[-3:]}'
 
-        # print(self.create_picture_payload(photo_filename, png_encoded, content_type))
+        #print(self.create_picture_payload(photo_filename, png_encoded, content_type))
 
         zip_code = self.zip_code.GetValue()
         location = self.kijiji_api.geo_location(zip_code)
