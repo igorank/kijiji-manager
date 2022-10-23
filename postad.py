@@ -1,8 +1,10 @@
 import wx
+import base64
 import xmltodict
-from kijiji_api import KijijiApiException
 from helper import show_message
 from helper import row_builder
+from werkzeug.datastructures import FileStorage
+from kijiji_api import KijijiApiException
 
 
 class PostAdDialog(wx.Dialog):
@@ -124,6 +126,20 @@ class PostAdDialog(wx.Dialog):
         # print(locations)
         # print(self.locs_to_strings(locations))
 
+        with open("atomic_habits.png", "rb") as f:
+            png_encoded = base64.b64encode(f.read())
+
+        print(type(png_encoded))
+        # print(png_encoded)
+
+        file_loc = open('atomic_habits.png', 'rb')
+        file = FileStorage(file_loc, content_type='image/png')
+        file.save(dst='atomic_habits2.png')
+
+        url = self.kijiji_api.upload_image(self.user_id, self.user_token, file.filename, png_encoded, file.content_type)
+        print(url)
+        file_loc.close()
+
         zip_code = self.zip_code.GetValue()
         location = self.kijiji_api.geo_location(zip_code)
 
@@ -159,7 +175,7 @@ class PostAdDialog(wx.Dialog):
                 },
                 'ad:visible-on-map': 'true',  # appears to make no difference if set to 'true' or 'false'
                 'attr:attributes': {'attr:attribute': [{'@localized-label': 'For Sale By', '@type': 'ENUM', '@accessibility-feature': 'false', '@name': 'forsaleby', 'attr:value': {'@localized-label': 'Owner', '#text': 'ownr'}}, {'@localized-label': 'Condition', '@type': 'ENUM', '@accessibility-feature': 'false', '@name': 'condition', 'attr:value': {'@localized-label': 'Used - Like new', '#text': 'usedlikenew'}}]},
-                'pic:pictures': None,
+                'pic:pictures': self.create_picture_payload(form.data),
                 'vid:videos': None,
                 'ad:adSlots': None,
                 'ad:listing-tags': None,
@@ -219,7 +235,6 @@ class PostAdDialog(wx.Dialog):
         return res['@id']
 
     def update_subcategories(self, event):
-        print(1)
         self.subcategories_list.Clear()
         # print(self.main_cats_list.GetCurrentSelection())
         self.subcategories_list.SetItems(self.get_subcategories(self.main_cats_list.GetCurrentSelection()))
@@ -228,7 +243,6 @@ class PostAdDialog(wx.Dialog):
         self.update_categories(event)
 
     def update_categories(self, event):
-        print(2)
         self.categories_list.Clear()
         # print(self.main_cats_list.GetCurrentSelection())
         self.categories_list.SetItems(self.get_categories(self.main_cats_list.GetCurrentSelection(),
@@ -322,3 +336,31 @@ class PostAdDialog(wx.Dialog):
         locs['Prince Edward Island'].append(island_dict)
 
         return locs
+
+    def create_picture_payload(self, data):
+        """Build picture payload dict from file* fields."""
+        payload = {'pic:picture': []}
+
+        # Mapping of image size names to size in px
+        image_sizes = {
+            'extraLarge': 800,
+            'large': 500,
+            'normal': 400,
+            'thumbnail': 64,
+        }
+
+        for key, value in data.items():
+            if key.startswith('file') and value:
+                link = self.kijiji_api.upload_image(self.user_id, self.user_token, value)
+
+                # Add a separate link for each image size
+                links = []
+                for size_name, size_px in image_sizes.items():
+                    links.append({
+                        '@rel': size_name,
+                        '@href': f'{link}?rule=kijijica-{size_px}-jpg',
+                    })
+
+                payload['pic:picture'].append({'pic:link': links})
+
+        return payload if len(payload['pic:picture']) else {}

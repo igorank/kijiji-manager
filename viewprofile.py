@@ -34,7 +34,7 @@ class ViewDialog(wx.Dialog):
         self.user_id = selected_row.user_id
         self.email = selected_row.email
         self.token = selected_row.token
-        proxy = Proxy(username="Th9skxds1GOpDHjq", password="mobile;ca;", host="proxy.soax.com", port="9298",
+        proxy = Proxy(username="BZFXnHuP1VQmmNEO", password="mobile;ca;", host="proxy.soax.com", port="9298",
                            url=" ")  # TEST
         self.k_api = KijijiApi(proxy=proxy)
         self.profile_info = self.k_api.get_profile(self.user_id, self.token)

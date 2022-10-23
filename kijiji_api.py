@@ -1,5 +1,7 @@
 from xml.parsers.expat import ExpatError, errors
 from httpx_socks import SyncProxyTransport
+from urllib.parse import urlparse, urlunparse
+from datetime import datetime, timedelta
 import httpx
 import xmltodict
 import pgeocode
@@ -211,6 +213,59 @@ class KijijiApi:
             return ad_id
         else:
             raise KijijiApiException(self._error_reason(doc))
+
+    def upload_image(self, user_id, token, filename, stream, content_type):
+        """Upload image Kijiji mobile API
+        :param user_id: user ID number
+        :param token: session token
+        :param data: werkzeug.FileStorage type image object
+        :return: full image URL
+        """
+
+        api_endpoint = 'https://mobile-api.kijiji.ca/v1/images/upload'
+
+        headers = self._headers_with_auth(user_id, token)
+        headers.update({
+            'Accept': 'application/json',
+            'X-ECG-Platform': 'android',
+            'X-ECG-App-Version': self.app_ver,
+        })
+
+        # Image expiration epoch timestamp
+        # Kijiji sets this to 199 days, 23 hours from now
+        expiration_timestamp = int((datetime.today() + timedelta(days=199, hours=23)).timestamp())
+
+        # Multipart form data
+        files = {
+            'bucketAlias': (None, b'ca-prod-fsbo-ads'),
+            'objectExpiration': (None, str(expiration_timestamp).encode('utf-8')),
+            # 'file': (data.filename, data.read(), data.content_type), # original
+            'file': (filename, stream, content_type),
+        }
+
+        #TEMP
+        print(stream)
+        print(filename)
+        print(content_type)
+
+        r = self.session.post(api_endpoint, headers=headers, files=files)
+
+        # Response is in JSON format
+        doc = r.json()
+
+        if r.status_code == 201:
+            try:
+                url = doc['url']
+            except KeyError as e:
+                raise KijijiApiException(f"Image URL not found in response text: {e}")
+
+            # Query string is appended to URL to specify image size (thumbnail size by default)
+            # Strip all query strings from URL
+            url = urlunparse(urlparse(url)._replace(query=''))
+
+            return url
+        else:
+            raise KijijiApiException(self._error_reason_mobile(doc))
 
     @staticmethod
     def _headers_with_auth(user_id, token):
