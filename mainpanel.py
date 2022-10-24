@@ -111,8 +111,11 @@ class MainPanel(wx.Panel):
             helper.show_message('Please select one profile from the list!', 'Error')
             return
 
-        with ViewDialog(selected_row) as dlg:
-            dlg.ShowModal()
+        try:
+            with ViewDialog(selected_row) as dlg:
+                dlg.ShowModal()
+        except Exception as e:
+            helper.show_message(str(e), 'Error')
 
         # self.show_all_records()
 

@@ -97,7 +97,7 @@ class PostAdDialog(wx.Dialog):
         photo_folder_lbl = wx.StaticText(self, label="Folder with Images :")
         photo_folder_lbl.SetFont(font)
         self.photo_folder = wx.DirPickerCtrl(self, id=wx.ID_ANY, path="",
-                                             message="Choose input directory", style=wx.DIRP_DEFAULT_STYLE,
+                                             message="Choose pictures directory", style=wx.DIRP_DEFAULT_STYLE,
                                              size=(400, -1))
         main_sizer.Add(row_builder([photo_folder_lbl, self.photo_folder]))
 
@@ -209,10 +209,13 @@ class PostAdDialog(wx.Dialog):
         print(xml_payload)
 
         # Submit final payload
-        # try:
-        print(self.kijiji_api.post_ad(self.user_id, self.user_token, xml_payload))
-        # except KijijiApiException as exception:
-        # show_message(str(exception), 'Error')
+        try:
+            ad_id = self.kijiji_api.post_ad(self.user_id, self.user_token, xml_payload)
+            show_message(f"Ad #{str(ad_id)} has been posted!", 'Posted', wx.ICON_INFORMATION)
+        except KijijiApiException as exception:
+            show_message(str(exception), 'Error')
+
+        self.Close()
 
     def get_category_id(self):
         if self.categories_list.IsEnabled():
