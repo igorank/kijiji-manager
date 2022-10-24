@@ -1,20 +1,20 @@
 import wx
 import os
-import base64
 import xmltodict
-from random import choice
+from random import choices
 from helper import show_message
 from helper import row_builder
+from picture import Picture
 from kijiji_api import KijijiApiException
 
 
 # Добавить фильтр только для png jpg...
-def get_random_photo(path):
+def get_random_photos(path, num=1):          # 2 - коли
     files = os.listdir(path)
     files = [f for f in files if os.path.isfile(path + '/' + f)]  # Filtering only the files.
-    photo_name = choice(files)
-    photo_path = path + "\\" + photo_name
-    return photo_path, photo_name
+    photo_names = choices(files, k=num)
+    # photo_path = path + "\\" + photo_name
+    return photo_names
 
 
 class PostAdDialog(wx.Dialog):
@@ -132,20 +132,12 @@ class PostAdDialog(wx.Dialog):
 
     def post(self, event):
 
-        # print(self.locations['loc:locations']['loc:location']['loc:location'])
-        # print(type(self.locations['loc:locations']['loc:location']['loc:location']))
-        # locations = self.get_sub_locations()
-        # print(locations)
-        # print(self.locs_to_strings(locations))
+        photos_name_list = get_random_photos(self.photo_folder.GetPath(), 2) # 2 - количество картинок
+        photos_list = []
+        for i in photos_name_list:
+            photos_list.append(Picture(i, self.photo_folder.GetPath()))
 
-        photo_path, photo_filename = get_random_photo(self.photo_folder.GetPath())
-
-        with open(photo_path, "rb") as f:
-            png_encoded = f.read()
-
-        content_type = f'image/{photo_filename[-3:]}'
-
-        #print(self.create_picture_payload(photo_filename, png_encoded, content_type))
+        #print(self.create_picture_payload(photos_list))
 
         zip_code = self.zip_code.GetValue()
         location = self.kijiji_api.geo_location(zip_code)
@@ -187,7 +179,7 @@ class PostAdDialog(wx.Dialog):
                     {'@localized-label': 'Condition', '@type': 'ENUM', '@accessibility-feature': 'false',
                      '@name': 'condition',
                      'attr:value': {'@localized-label': 'Used - Like new', '#text': 'usedlikenew'}}]},
-                'pic:pictures': self.create_picture_payload(photo_filename, png_encoded, content_type),
+                'pic:pictures': self.create_picture_payload(photos_list),
                 # 'pic:pictures': None,
                 'vid:videos': None,
                 'ad:adSlots': None,
@@ -212,10 +204,9 @@ class PostAdDialog(wx.Dialog):
         try:
             ad_id = self.kijiji_api.post_ad(self.user_id, self.user_token, xml_payload)
             show_message(f"Ad #{str(ad_id)} has been posted!", 'Posted', wx.ICON_INFORMATION)
+            self.Close()
         except KijijiApiException as exception:
             show_message(str(exception), 'Error')
-
-        self.Close()
 
     def get_category_id(self):
         if self.categories_list.IsEnabled():
@@ -364,7 +355,7 @@ class PostAdDialog(wx.Dialog):
 
         return locs
 
-    def create_picture_payload(self, photo_filename, png_encoded, content_type):
+    def create_picture_payload(self, data):
         """Build picture payload dict from file* fields."""
         payload = {'pic:picture': []}
 
@@ -376,16 +367,17 @@ class PostAdDialog(wx.Dialog):
             'thumbnail': 64,
         }
 
-        link = self.kijiji_api.upload_image(self.user_id, self.user_token, photo_filename, png_encoded, content_type)
+        for value in data:
+            link = self.kijiji_api.upload_image(self.user_id, self.user_token, value)
 
-        # Add a separate link for each image size
-        links = []
-        for size_name, size_px in image_sizes.items():
-            links.append({
-                '@rel': size_name,
-                '@href': f'{link}?rule=kijijica-{size_px}-jpg',
-            })
+            # Add a separate link for each image size
+            links = []
+            for size_name, size_px in image_sizes.items():
+                links.append({
+                    '@rel': size_name,
+                    '@href': f'{link}?rule=kijijica-{size_px}-jpg',
+                })
 
-        payload['pic:picture'].append({'pic:link': links})
+            payload['pic:picture'].append({'pic:link': links})
 
         return payload if len(payload['pic:picture']) else {}

@@ -214,7 +214,8 @@ class KijijiApi:
         else:
             raise KijijiApiException(self._error_reason(doc))
 
-    def upload_image(self, user_id, token, filename, stream, content_type):
+    # def upload_image(self, user_id, token, filename, stream, content_type):
+    def upload_image(self, user_id, token, data):
         """Upload image Kijiji mobile API
         :param user_id: user ID number
         :param token: session token
@@ -239,8 +240,8 @@ class KijijiApi:
         files = {
             'bucketAlias': (None, b'ca-prod-fsbo-ads'),
             'objectExpiration': (None, str(expiration_timestamp).encode('utf-8')),
-            # 'file': (data.filename, data.read(), data.content_type), # original
-            'file': (filename, stream, content_type),
+            'file': (data.filename, data.read(), data.content_type), # original
+            # 'file': (filename, stream, content_type),
         }
 
         r = self.session.post(api_endpoint, headers=headers, files=files)
