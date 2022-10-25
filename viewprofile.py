@@ -20,8 +20,11 @@ class AD(object):
 
 
 def dateConverter(string):
-    x = string.split("T")
-    return x[0] + ' ' + x[1][:8]
+    try:
+        x = string.split("T")
+        return x[0] + ' ' + x[1][:8]
+    except AttributeError:
+        return
 
 
 class ViewDialog(wx.Dialog):

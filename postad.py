@@ -6,6 +6,7 @@ from random import choices
 from helper import show_message
 from helper import row_builder
 from picture import Picture
+from randdesc import RandomDescription
 from kijiji_api import KijijiApiException
 
 
@@ -68,7 +69,10 @@ class PostAdDialog(wx.Dialog):
         category_lbl.SetFont(font)
         self.main_cats_list = wx.Choice(self, wx.ID_ANY, choices=main_cats)
         # self.main_cats_list.SetSelection(0)
-        self.main_cats_list.SetSelection(main_cats.index(self.config['DEFAULT_AD']['MAIN_CATEGORY']))
+        if self.config['DEFAULT_AD']['MAIN_CATEGORY']:
+            self.main_cats_list.SetSelection(main_cats.index(self.config['DEFAULT_AD']['MAIN_CATEGORY']))
+        else:
+            self.main_cats_list.SetSelection(0)
         self.main_cats_list.Bind(wx.EVT_CHOICE, self.update_subcategories)
         # self.main_cats_list.Bind(wx.EVT_CHOICE, self.update_categories)
         main_sizer.Add(row_builder([category_lbl, self.main_cats_list]))
@@ -78,7 +82,10 @@ class PostAdDialog(wx.Dialog):
         self.subcategories_list = wx.ComboBox(self, wx.ID_ANY, style=wx.CB_READONLY,
                                               choices=self.get_subcategories(self.main_cats_list.GetCurrentSelection()))
         # self.subcategories_list.SetSelection(0)
-        self.subcategories_list.SetSelection(self.get_subcategories(self.main_cats_list.GetCurrentSelection()).index(self.config['DEFAULT_AD']['SUBCATEGORY']))
+        if self.config['DEFAULT_AD']['SUBCATEGORY']:
+            self.subcategories_list.SetSelection(self.get_subcategories(self.main_cats_list.GetCurrentSelection()).index(self.config['DEFAULT_AD']['SUBCATEGORY']))
+        else:
+            self.subcategories_list.SetSelection(0)
         self.subcategories_list.Bind(wx.EVT_COMBOBOX, self.update_categories)
         main_sizer.Add(row_builder([subcategories_lbl, self.subcategories_list]))
 
@@ -92,8 +99,11 @@ class PostAdDialog(wx.Dialog):
         else:
             self.categories_list.Enable()
             # self.categories_list.SetSelection(0)
-            self.categories_list.SetSelection(self.get_categories(self.main_cats_list.GetCurrentSelection(),
+            if self.config['DEFAULT_AD']['CATEGORY']:
+                self.categories_list.SetSelection(self.get_categories(self.main_cats_list.GetCurrentSelection(),
                                                                   self.subcategories_list.GetCurrentSelection()).index(self.config['DEFAULT_AD']['CATEGORY']))
+            else:
+                self.categories_list.SetSelection(0)
         # self.main_cats_list.Bind(wx.EVT_CHOICE, self.update_categories)
         # self.main_cats_list.Bind(wx.EVT_COMBOBOX, self.update_categories)
         # self.subcategories_list.Bind(wx.EVT_COMBOBOX, self.update_subcategories)
@@ -101,12 +111,12 @@ class PostAdDialog(wx.Dialog):
 
         description_lbl = wx.StaticText(self, label="Description :")
         description_lbl.SetFont(font)
-        self.description = wx.TextCtrl(self, value=self.config['DEFAULT_AD']['DESCRIPTION'], size=(400, 150), style=wx.TE_MULTILINE)
+        self.description = wx.TextCtrl(self, value=RandomDescription(self.config['DEFAULT_AD']['DESCRIPTION_FOLDER']) if self.config['DEFAULT_AD']['DESCRIPTION_FOLDER'] else "", size=(400, 150), style=wx.TE_MULTILINE)
         main_sizer.Add(row_builder([description_lbl, self.description]))
 
         photo_folder_lbl = wx.StaticText(self, label="Folder with Images :")
         photo_folder_lbl.SetFont(font)
-        self.photo_folder = wx.DirPickerCtrl(self, id=wx.ID_ANY, path=self.config['DEFAULT_AD']['IMAGES_FOLDER'],
+        self.photo_folder = wx.DirPickerCtrl(self, id=wx.ID_ANY, path=self.config['DEFAULT_AD']['IMAGES_FOLDER'] if self.config['DEFAULT_AD']['IMAGES_FOLDER'] else "",
                                              message="Choose pictures directory", style=wx.DIRP_DEFAULT_STYLE,
                                              size=(400, -1))
         main_sizer.Add(row_builder([photo_folder_lbl, self.photo_folder]))
@@ -116,7 +126,10 @@ class PostAdDialog(wx.Dialog):
         self.locations_list = wx.ComboBox(self, wx.ID_ANY, size=(400, -1), style=wx.CB_READONLY,
                                           choices=self.locs_to_strings(sub_locations))
         # self.locations_list.SetSelection(0)
-        self.locations_list.SetSelection(self.locs_to_strings(sub_locations).index(self.config['DEFAULT_AD']['LOCATION']))
+        if self.config['DEFAULT_AD']['LOCATION']:
+            self.locations_list.SetSelection(self.locs_to_strings(sub_locations).index(self.config['DEFAULT_AD']['LOCATION']))
+        else:
+            self.locations_list.SetSelection(0)
         main_sizer.Add(row_builder([locations_lbl, self.locations_list]))
 
         fulladdress_lbl = wx.StaticText(self, label="Full Address :")
@@ -132,6 +145,8 @@ class PostAdDialog(wx.Dialog):
         price_lbl = wx.StaticText(self, label="Price :")
         price_lbl.SetFont(font)
         self.price = wx.TextCtrl(self, value=self.config['DEFAULT_AD']['PRICE'], size=(80, -1))
+        if self.main_cats_list.GetCurrentSelection() == 4:
+            self.price.Disable()
         main_sizer.Add(row_builder([price_lbl, self.price]))
 
         post_btn = wx.Button(self, label="Post")
