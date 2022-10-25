@@ -127,10 +127,10 @@ class ViewDialog(wx.Dialog):
         self.updateSpreadsheet()
 
     def on_post(self, event):
-        with PostAdDialog(self.k_api, self.user_id, self.email, self.token) as dlg:
+        with PostAdDialog(self.k_api, self.user_id, self.email, self.token, self.updateSpreadsheet) as dlg:
             dlg.ShowModal()
 
-        self.updateSpreadsheet()
+        # self.updateSpreadsheet()
 
     def updateSpreadsheet(self):
         ads = self.k_api.get_ad(self.user_id, self.token)

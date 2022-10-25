@@ -1,6 +1,7 @@
 import wx
 import os
 import xmltodict
+import configparser
 from random import choices
 from helper import show_message
 from helper import row_builder
@@ -19,9 +20,13 @@ def get_random_photos(path, num=1):          # 2 - коли
 
 class PostAdDialog(wx.Dialog):
 
-    def __init__(self, kijiji_api, user_id, email, user_token):
+    def __init__(self, kijiji_api, user_id, email, user_token, updateSpreadsheet):
         """Constructor"""
         super().__init__(None, title="Post Ad", size=wx.Size(480, 530)) # Size(480, 640)
+        self.config = configparser.ConfigParser()
+        self.config.read('config.ini')
+
+        self.updateSpreadsheet = updateSpreadsheet
         self.kijiji_api = kijiji_api
         self.user_id = user_id
         self.email = email
@@ -54,7 +59,7 @@ class PostAdDialog(wx.Dialog):
 
         title_lbl = wx.StaticText(self, label="Title :")
         title_lbl.SetFont(font)
-        self.title = wx.TextCtrl(self, value="", size=(420, -1))
+        self.title = wx.TextCtrl(self, value=self.config['DEFAULT_AD']['TITLE'], size=(420, -1))
         self.title.SetMaxLength(64)
         main_sizer.Add(row_builder([title_lbl, self.title]))
 
@@ -62,7 +67,8 @@ class PostAdDialog(wx.Dialog):
         category_lbl = wx.StaticText(self, label="Main Category :")
         category_lbl.SetFont(font)
         self.main_cats_list = wx.Choice(self, wx.ID_ANY, choices=main_cats)
-        self.main_cats_list.SetSelection(0)
+        # self.main_cats_list.SetSelection(0)
+        self.main_cats_list.SetSelection(main_cats.index(self.config['DEFAULT_AD']['MAIN_CATEGORY']))
         self.main_cats_list.Bind(wx.EVT_CHOICE, self.update_subcategories)
         # self.main_cats_list.Bind(wx.EVT_CHOICE, self.update_categories)
         main_sizer.Add(row_builder([category_lbl, self.main_cats_list]))
@@ -71,7 +77,8 @@ class PostAdDialog(wx.Dialog):
         subcategories_lbl.SetFont(font)
         self.subcategories_list = wx.ComboBox(self, wx.ID_ANY, style=wx.CB_READONLY,
                                               choices=self.get_subcategories(self.main_cats_list.GetCurrentSelection()))
-        self.subcategories_list.SetSelection(0)
+        # self.subcategories_list.SetSelection(0)
+        self.subcategories_list.SetSelection(self.get_subcategories(self.main_cats_list.GetCurrentSelection()).index(self.config['DEFAULT_AD']['SUBCATEGORY']))
         self.subcategories_list.Bind(wx.EVT_COMBOBOX, self.update_categories)
         main_sizer.Add(row_builder([subcategories_lbl, self.subcategories_list]))
 
@@ -84,7 +91,9 @@ class PostAdDialog(wx.Dialog):
             self.categories_list.Disable()
         else:
             self.categories_list.Enable()
-            self.categories_list.SetSelection(0)
+            # self.categories_list.SetSelection(0)
+            self.categories_list.SetSelection(self.get_categories(self.main_cats_list.GetCurrentSelection(),
+                                                                  self.subcategories_list.GetCurrentSelection()).index(self.config['DEFAULT_AD']['CATEGORY']))
         # self.main_cats_list.Bind(wx.EVT_CHOICE, self.update_categories)
         # self.main_cats_list.Bind(wx.EVT_COMBOBOX, self.update_categories)
         # self.subcategories_list.Bind(wx.EVT_COMBOBOX, self.update_subcategories)
@@ -92,12 +101,12 @@ class PostAdDialog(wx.Dialog):
 
         description_lbl = wx.StaticText(self, label="Description :")
         description_lbl.SetFont(font)
-        self.description = wx.TextCtrl(self, value="", size=(400, 150), style=wx.TE_MULTILINE)
+        self.description = wx.TextCtrl(self, value=self.config['DEFAULT_AD']['DESCRIPTION'], size=(400, 150), style=wx.TE_MULTILINE)
         main_sizer.Add(row_builder([description_lbl, self.description]))
 
         photo_folder_lbl = wx.StaticText(self, label="Folder with Images :")
         photo_folder_lbl.SetFont(font)
-        self.photo_folder = wx.DirPickerCtrl(self, id=wx.ID_ANY, path="",
+        self.photo_folder = wx.DirPickerCtrl(self, id=wx.ID_ANY, path=self.config['DEFAULT_AD']['IMAGES_FOLDER'],
                                              message="Choose pictures directory", style=wx.DIRP_DEFAULT_STYLE,
                                              size=(400, -1))
         main_sizer.Add(row_builder([photo_folder_lbl, self.photo_folder]))
@@ -106,22 +115,23 @@ class PostAdDialog(wx.Dialog):
         locations_lbl.SetFont(font)
         self.locations_list = wx.ComboBox(self, wx.ID_ANY, size=(400, -1), style=wx.CB_READONLY,
                                           choices=self.locs_to_strings(sub_locations))
-        self.locations_list.SetSelection(0)
+        # self.locations_list.SetSelection(0)
+        self.locations_list.SetSelection(self.locs_to_strings(sub_locations).index(self.config['DEFAULT_AD']['LOCATION']))
         main_sizer.Add(row_builder([locations_lbl, self.locations_list]))
 
         fulladdress_lbl = wx.StaticText(self, label="Full Address :")
         fulladdress_lbl.SetFont(font)
-        self.fulladdress = wx.TextCtrl(self, value="", size=(400, -1))
+        self.fulladdress = wx.TextCtrl(self, value=self.config['DEFAULT_AD']['FULL_ADDRESS'], size=(400, -1))
         main_sizer.Add(row_builder([fulladdress_lbl, self.fulladdress]))
 
         zip_code_lbl = wx.StaticText(self, label="Zip-Code :")
         zip_code_lbl.SetFont(font)
-        self.zip_code = wx.TextCtrl(self, value="", size=(100, -1))
+        self.zip_code = wx.TextCtrl(self, value=self.config['DEFAULT_AD']['POSTAL_CODE'], size=(100, -1))
         main_sizer.Add(row_builder([zip_code_lbl, self.zip_code]))
 
         price_lbl = wx.StaticText(self, label="Price :")
         price_lbl.SetFont(font)
-        self.price = wx.TextCtrl(self, value="", size=(80, -1))
+        self.price = wx.TextCtrl(self, value=self.config['DEFAULT_AD']['PRICE'], size=(80, -1))
         main_sizer.Add(row_builder([price_lbl, self.price]))
 
         post_btn = wx.Button(self, label="Post")
@@ -133,12 +143,10 @@ class PostAdDialog(wx.Dialog):
 
     def post(self, event):
 
-        photos_name_list = get_random_photos(self.photo_folder.GetPath(), 2) # 2 - количество картинок
+        photos_name_list = get_random_photos(self.photo_folder.GetPath(), int(self.config['DEFAULT_AD']['IMAGES_NUM'])) # второй аргумент - количество картинок
         photos_list = []
         for i in photos_name_list:
             photos_list.append(Picture(i, self.photo_folder.GetPath()))
-
-        #print(self.create_picture_payload(photos_list))
 
         zip_code = self.zip_code.GetValue()
         location = self.kijiji_api.geo_location(zip_code)
@@ -206,6 +214,7 @@ class PostAdDialog(wx.Dialog):
             ad_id = self.kijiji_api.post_ad(self.user_id, self.user_token, xml_payload)
             show_message(f"Ad #{str(ad_id)} has been posted!", 'Posted', wx.ICON_INFORMATION)
             self.Close()
+            self.updateSpreadsheet()
         # except KijijiApiException as exception:
         except Exception as exception:
             show_message(str(exception), 'Error')
