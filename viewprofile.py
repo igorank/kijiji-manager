@@ -130,6 +130,8 @@ class ViewDialog(wx.Dialog):
         with PostAdDialog(self.k_api, self.user_id, self.email, self.token) as dlg:
             dlg.ShowModal()
 
+        self.updateSpreadsheet()
+
     def updateSpreadsheet(self):
         ads = self.k_api.get_ad(self.user_id, self.token)
         print(ads) # TEMP
@@ -138,12 +140,20 @@ class ViewDialog(wx.Dialog):
         if 'ad:ad' in ads['ad:ads']:
             if type(ads['ad:ads']['ad:ad']) is list:
                 for i in ads['ad:ads']['ad:ad']:
-                    data.append(AD(i['@id'], i['ad:title'],
-                                   i['cat:category']['cat:id-name'],
-                                   i['ad:price']['types:amount'],
-                                   i['ad:view-ad-count'],
-                                   dateConverter(i['ad:start-date-time']),
-                                   dateConverter(i['ad:end-date-time'])))
+                    try:
+                        data.append(AD(i['@id'], i['ad:title'],
+                                       i['cat:category']['cat:id-name'],
+                                       i['ad:price']['types:amount'],
+                                       i['ad:view-ad-count'],
+                                       dateConverter(i['ad:start-date-time']),
+                                       dateConverter(i['ad:end-date-time'])))
+                    except KeyError:
+                        data.append(AD(i['@id'], i['ad:title'],
+                                       i['cat:category']['cat:id-name'],
+                                       " ",
+                                       i['ad:view-ad-count'],
+                                       dateConverter(i['ad:start-date-time']),
+                                       dateConverter(i['ad:end-date-time'])))
             elif type(ads['ad:ads']['ad:ad']) is dict:                  # Если одна реклама
                 data.append(AD(ads['ad:ads']['ad:ad']['@id'], ads['ad:ads']['ad:ad']['ad:title'],
                                ads['ad:ads']['ad:ad']['cat:category']['cat:id-name'],

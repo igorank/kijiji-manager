@@ -21,7 +21,7 @@ class PostAdDialog(wx.Dialog):
 
     def __init__(self, kijiji_api, user_id, email, user_token):
         """Constructor"""
-        super().__init__(None, title="Post Ad", size=wx.Size(480, 640))
+        super().__init__(None, title="Post Ad", size=wx.Size(480, 530)) # Size(480, 640)
         self.kijiji_api = kijiji_api
         self.user_id = user_id
         self.email = email
@@ -30,6 +30,7 @@ class PostAdDialog(wx.Dialog):
         sub_locations = self.get_sub_locations()
         # Категории
         self.cats = kijiji_api.get_categories(user_id, user_token)
+        # print(self.cats) #TEMP
         # print(cats['cat:categories']['cat:category']['cat:category'][0]['cat:category'])
         # print(self.cats['cat:categories']['cat:category']['cat:category'][0]['cat:category'][1])
         main_cats = []
@@ -39,7 +40,7 @@ class PostAdDialog(wx.Dialog):
         main_cats.pop()
         # print(type(self.cats))
 
-        # #Локация
+        # #Локация TEMP
         # locs = kijiji_api.get_locations(user_id, user_token)
         # print(locs)
 
@@ -53,7 +54,7 @@ class PostAdDialog(wx.Dialog):
 
         title_lbl = wx.StaticText(self, label="Title :")
         title_lbl.SetFont(font)
-        self.title = wx.TextCtrl(self, value="", size=(400, -1))
+        self.title = wx.TextCtrl(self, value="", size=(420, -1))
         self.title.SetMaxLength(64)
         main_sizer.Add(row_builder([title_lbl, self.title]))
 
@@ -113,7 +114,7 @@ class PostAdDialog(wx.Dialog):
         self.fulladdress = wx.TextCtrl(self, value="", size=(400, -1))
         main_sizer.Add(row_builder([fulladdress_lbl, self.fulladdress]))
 
-        zip_code_lbl = wx.StaticText(self, label="Zip-code :")
+        zip_code_lbl = wx.StaticText(self, label="Zip-Code :")
         zip_code_lbl.SetFont(font)
         self.zip_code = wx.TextCtrl(self, value="", size=(100, -1))
         main_sizer.Add(row_builder([zip_code_lbl, self.zip_code]))
@@ -173,14 +174,14 @@ class PostAdDialog(wx.Dialog):
                     'types:zip-code': zip_code,
                 },
                 'ad:visible-on-map': 'true',  # appears to make no difference if set to 'true' or 'false'
-                'attr:attributes': {'attr:attribute': [
-                    {'@localized-label': 'For Sale By', '@type': 'ENUM', '@accessibility-feature': 'false',
-                     '@name': 'forsaleby', 'attr:value': {'@localized-label': 'Owner', '#text': 'ownr'}},
-                    {'@localized-label': 'Condition', '@type': 'ENUM', '@accessibility-feature': 'false',
-                     '@name': 'condition',
-                     'attr:value': {'@localized-label': 'Used - Like new', '#text': 'usedlikenew'}}]},
+                'attr:attributes': None, # TEMP
+                # 'attr:attributes': {'attr:attribute': [
+                #     {'@localized-label': 'For Sale By', '@type': 'ENUM', '@accessibility-feature': 'false',
+                #      '@name': 'forsaleby', 'attr:value': {'@localized-label': 'Owner', '#text': 'ownr'}},
+                #     {'@localized-label': 'Condition', '@type': 'ENUM', '@accessibility-feature': 'false',
+                #      '@name': 'condition',
+                #      'attr:value': {'@localized-label': 'Used - Like new', '#text': 'usedlikenew'}}]},
                 'pic:pictures': self.create_picture_payload(photos_list),
-                # 'pic:pictures': None,
                 'vid:videos': None,
                 'ad:adSlots': None,
                 'ad:listing-tags': None,
@@ -205,7 +206,8 @@ class PostAdDialog(wx.Dialog):
             ad_id = self.kijiji_api.post_ad(self.user_id, self.user_token, xml_payload)
             show_message(f"Ad #{str(ad_id)} has been posted!", 'Posted', wx.ICON_INFORMATION)
             self.Close()
-        except KijijiApiException as exception:
+        # except KijijiApiException as exception:
+        except Exception as exception:
             show_message(str(exception), 'Error')
 
     def get_category_id(self):
@@ -251,6 +253,11 @@ class PostAdDialog(wx.Dialog):
         return res['@id']
 
     def update_subcategories(self, event):
+        if self.main_cats_list.GetCurrentSelection() == 4:
+            self.price.Disable()        # Выключаем поле Price, если выбрана категория Services
+        else:
+            self.price.Enable()
+
         self.subcategories_list.Clear()
         # print(self.main_cats_list.GetCurrentSelection())
         self.subcategories_list.SetItems(self.get_subcategories(self.main_cats_list.GetCurrentSelection()))
