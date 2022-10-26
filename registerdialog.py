@@ -9,10 +9,11 @@ from wx.lib.pubsub import pub
 
 class RegisterDialog(wx.Dialog):
 
-    def __init__(self, title="Register"):
+    def __init__(self, proxy, title="Register"):
         """Constructor"""
         style = wx.DEFAULT_FRAME_STYLE & (~wx.CLOSE_BOX) & (~wx.MAXIMIZE_BOX) & (~wx.RESIZE_BORDER) & (~wx.MINIMIZE_BOX)
         super().__init__(None, title="%s Accounts" % title, style=style)
+        self.proxy = proxy
         self.Centre()
 
         self.ID_START = wx.NewId()
@@ -59,7 +60,6 @@ class RegisterDialog(wx.Dialog):
         self.worker = None
 
     def updateProgress(self, msg):
-        """"""
         self.count += 10
 
         if self.count >= (int(self.num_profiles) * 100):
@@ -85,7 +85,7 @@ class RegisterDialog(wx.Dialog):
             self.main_sizer.Add(self.status, 0, wx.CENTER, 5)
 
             # Запускаем поток регистрации
-            self.worker = RegisterThread(self, self.num_profiles)
+            self.worker = RegisterThread(self, self.num_profiles, self.proxy)
 
             self.progress.Show()
             self.progress.SetRange((int(self.num_profiles)) * 100)

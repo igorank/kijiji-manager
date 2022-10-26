@@ -1,5 +1,7 @@
 import wx
 import helper
+import configparser
+from proxy import Proxy
 from viewprofile import ViewDialog
 from registerdialog import RegisterDialog
 from ObjectListView import ObjectListView, ColumnDefn
@@ -23,6 +25,13 @@ class MainPanel(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY)
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.config = configparser.ConfigParser()
+        self.config.read('config.ini')
+
+        self.proxy = Proxy(username=self.config['PROXY']['USERNAME'], password=self.config['PROXY']['PASSWORD'],
+                           host=self.config['PROXY']['HOST'], port=self.config['PROXY']['PORT'],
+                           url=self.config['PROXY']['URL'])
 
         gsheets = GSheet("1gO3m2DJmO6Lwf27Wjustop9eyik9TGO5_9MeJZbetP0", "kijiji-362509-c751d3f68ea1.json")
         self.main_sheet = gsheets.get_main_worksheet(0)
@@ -72,7 +81,7 @@ class MainPanel(wx.Panel):
         self.SetSizer(mainSizer)
 
     def registerControl(self, event):
-        with RegisterDialog() as dlg:
+        with RegisterDialog(self.proxy) as dlg:
             dlg.ShowModal()
             self.updateSpreadsheet()
 
@@ -112,7 +121,7 @@ class MainPanel(wx.Panel):
             return
 
         #try:
-        with ViewDialog(selected_row) as dlg:
+        with ViewDialog(selected_row, self.config, self.proxy) as dlg:
             dlg.ShowModal()
         # except Exception as e:
         #     helper.show_message(str(e), 'Error')

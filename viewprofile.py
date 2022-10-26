@@ -30,15 +30,14 @@ def dateConverter(string):
 class ViewDialog(wx.Dialog):
 
     # def __init__(self, selected_row, title="Profile"):
-    def __init__(self, selected_row):
+    def __init__(self, selected_row, config, proxy):
         """Constructor"""
         super().__init__(None, title="%s's profile" % selected_row.email, size=wx.Size(640, 480))
         # super().__init__(None, title=title)
+        self.config = config
         self.user_id = selected_row.user_id
         self.email = selected_row.email
         self.token = selected_row.token
-        proxy = Proxy(username="BZFXnHuP1VQmmNEO", password="mobile;ca;", host="proxy.soax.com", port="9297",
-                           url=" ")  # TEST
         self.k_api = KijijiApi(proxy=proxy)
         self.profile_info = self.k_api.get_profile(self.user_id, self.token)
 
@@ -130,7 +129,7 @@ class ViewDialog(wx.Dialog):
         self.updateSpreadsheet()
 
     def on_post(self, event):
-        with PostAdDialog(self.k_api, self.user_id, self.email, self.token, self.updateSpreadsheet) as dlg:
+        with PostAdDialog(self.k_api, self.user_id, self.email, self.token, self.config, self.updateSpreadsheet) as dlg:
             dlg.ShowModal()
 
         # self.updateSpreadsheet()

@@ -228,8 +228,11 @@ class Email(Driver):
                         driver.get(
                             "https://email.inbox.lv/?utm_source=portal&utm_medium=vertical&utm_term=ru&utm_campaign"
                             "=toolbar")
+                        WebDriverWait(driver, 10).until(
+                            EC.element_to_be_clickable(
+                                (By.XPATH, "/html/body/div/div/div/div/div[5]/div/a")))
                         driver.find_element("xpath",
-                                            "/html/body/div/div/div/div/div[5]/div/a").click()  # button next
+                                                "/html/body/div/div/div/div/div[5]/div/a").click()  # button next
                         driver.find_element("xpath",
                                             "/html/body/div/div/div/div/div[4]/a").click()  # button back
                         print('Done.')

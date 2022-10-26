@@ -36,10 +36,11 @@ class ResultEvent(wx.PyEvent):
 
 
 class RegisterThread(Thread):
-    def __init__(self, notify_window, num):
+    def __init__(self, notify_window, num, proxy):
         Thread.__init__(self)
-        self.proxy = Proxy(username="SUV4FU", password="eT3PAwKEqavC", host="oproxy.site", port="12536",
-                      url="https://mobileproxy.space/reload.html?proxy_key=d7b59504de76caa1d494e882584cca74")
+        # self.proxy = Proxy(username="SUV4FU", password="eT3PAwKEqavC", host="oproxy.site", port="10006",
+        #               url="https://mobileproxy.space/reload.html?proxy_key=d7b59504de76caa1d494e882584cca74")
+        self.proxy = proxy
         self._notify_window = notify_window
         self._want_abort = 0
         self.k_api = KijijiApi(proxy=self.proxy)

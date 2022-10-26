@@ -1,7 +1,6 @@
 import wx
 import os
 import xmltodict
-import configparser
 from random import choices
 from helper import show_message
 from helper import row_builder
@@ -21,11 +20,12 @@ def get_random_photos(path, num=1):          # 2 - коли
 
 class PostAdDialog(wx.Dialog):
 
-    def __init__(self, kijiji_api, user_id, email, user_token, updateSpreadsheet):
+    def __init__(self, kijiji_api, user_id, email, user_token, config, updateSpreadsheet):
         """Constructor"""
         super().__init__(None, title="Post Ad", size=wx.Size(480, 530)) # Size(480, 640)
-        self.config = configparser.ConfigParser()
-        self.config.read('config.ini')
+        # self.config = configparser.ConfigParser()
+        # self.config.read('config.ini')
+        self.config = config
 
         self.updateSpreadsheet = updateSpreadsheet
         self.kijiji_api = kijiji_api
