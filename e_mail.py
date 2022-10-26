@@ -16,12 +16,15 @@ from selenium.webdriver.support.ui import Select
 
 class Email(Driver):
 
-    def __init__(self, chrome_path, twocaptcha_token):
+    def __init__(self, chrome_path, twocaptcha_token, forw_email, forw_email_pass):
         super().__init__(chrome_p=chrome_path)
         self.names = FileManager.get_filesdata('names\\names_eng.txt')
         self.surnames = FileManager.get_filesdata('names\\surnames_eng.txt')
         self.twocaptcha_api_key = twocaptcha_token
         self.successful_registrations = 0
+
+        self.forw_email = forw_email
+        self.forw_email_pass = forw_email_pass
 
     @staticmethod
     def press_ok(driver):
@@ -86,7 +89,7 @@ class Email(Driver):
         return False
 
     @staticmethod
-    def add_email_forwarding(driver) -> str:
+    def add_email_forwarding(driver, forw_email, password) -> str:
         WebDriverWait(driver, 20).until(EC.element_to_be_clickable(
             (By.XPATH, '//*[@id="options-menu_li_forward_list-aliases-forward"]')))
         driver.find_element("xpath",
@@ -102,8 +105,7 @@ class Email(Driver):
             "ktrhteblpavynbpqniuo@outlook.com")
         driver.find_element("xpath",
                             '//*[@id="btn_add-email"]').click()
-        forw_email = "ktrhteblpavynbpqniuo@outlook.com"
-        mail_reader = EmailReader("outlook.office365.com", forw_email, "1995igor1607")
+        mail_reader = EmailReader("outlook.office365.com", str(forw_email), str(password))
         code = mail_reader.get_forw_code(120)
         WebDriverWait(driver, 20).until(EC.presence_of_element_located(
             (By.XPATH, '//*[@id="container_prop-content_ol_existing-forwards"]/li/div/form/div/input')))
@@ -302,10 +304,12 @@ class Email(Driver):
                             continue
                         driver.find_element("xpath", '//*[@id="pop3-pass-modal-submit"]').click()  # OK Button
                         print('Done.')
-                        print('Setting up email forwarding.', end=' ')
-                        if True:
-                            forw_email = self.add_email_forwarding(driver)
-                        print('Done.')
+                        if self.forw_email and self.forw_email_pass:
+                            print('Setting up email forwarding.', end=' ')
+                            forw_email = self.add_email_forwarding(driver, self.forw_email, self.forw_email_pass)
+                            print('Done.')
+                        else:
+                            forw_email = ""
                         print('Finishing registration.', end=' ')
                         self.successful_registrations += 1
                         driver.close()

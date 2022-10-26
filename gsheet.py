@@ -28,6 +28,3 @@ class GSheet(metaclass=SingletonMeta):
 
     def get_main_worksheet(self, worksheet_id):
         return self.gs_client.get_worksheet_by_id(int(worksheet_id))
-
-    def get_leads_worksheet(self, worksheet_id):
-        return self.gs_client.get_worksheet_by_id(int(worksheet_id))

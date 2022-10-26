@@ -9,13 +9,14 @@ from wx.lib.pubsub import pub
 
 class RegisterDialog(wx.Dialog):
 
-    def __init__(self, proxy, main_sheet, title="Register"):
+    def __init__(self, config, proxy, main_sheet, title="Register"):
         """Constructor"""
         style = wx.DEFAULT_FRAME_STYLE & (~wx.CLOSE_BOX) & (~wx.MAXIMIZE_BOX) & (~wx.RESIZE_BORDER) & (~wx.MINIMIZE_BOX)
         super().__init__(None, title="%s Accounts" % title, style=style)
         self.proxy = proxy
         self.Centre()
 
+        self.config = config
         self.main_sheet = main_sheet
 
         self.ID_START = wx.NewId()
@@ -66,7 +67,7 @@ class RegisterDialog(wx.Dialog):
 
         if self.count >= (int(self.num_profiles) * 100):
             self.Destroy()
-            show_message(f"{self.num_profiles} profiles have been registered!", 'Success', wx.ICON_INFORMATION)
+            show_message(f"{self.num_profiles} profile(s) has/have been registered!", 'Success', wx.ICON_INFORMATION)
 
         self.progress.SetValue(self.count)
 
@@ -87,7 +88,7 @@ class RegisterDialog(wx.Dialog):
             self.main_sizer.Add(self.status, 0, wx.CENTER, 5)
 
             # Запускаем поток регистрации
-            self.worker = RegisterThread(self, self.num_profiles, self.proxy, self.main_sheet)
+            self.worker = RegisterThread(self, self.config, self.num_profiles, self.proxy, self.main_sheet)
 
             self.progress.Show()
             self.progress.SetRange((int(self.num_profiles)) * 100)

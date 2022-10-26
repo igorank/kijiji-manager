@@ -6,7 +6,7 @@ from helper import show_message
 from helper import row_builder
 from picture import Picture
 from randdesc import RandomDescription
-from kijiji_api import KijijiApiException
+# from kijiji_api import KijijiApiException
 
 
 # Добавить фильтр только для png jpg...

@@ -83,7 +83,7 @@ class MainPanel(wx.Panel):
         self.SetSizer(mainSizer)
 
     def registerControl(self, event):
-        with RegisterDialog(self.proxy, self.main_sheet) as dlg:
+        with RegisterDialog(self.config, self.proxy, self.main_sheet) as dlg:
             dlg.ShowModal()
             self.updateSpreadsheet()
 

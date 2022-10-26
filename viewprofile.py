@@ -1,5 +1,4 @@
 import wx
-from proxy import Proxy
 from helper import show_message
 from kijiji_api import KijijiApi
 from helper import row_builder

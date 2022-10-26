@@ -21,7 +21,6 @@ class GenApp(wx.App):
         wx.App.__init__(self, redirect, filename)
 
     def OnInit(self):
-        # create frame here
         frame = MainFrame()
         frame.Show()
         return True
