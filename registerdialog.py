@@ -47,11 +47,11 @@ class RegisterDialog(wx.Dialog):
         self.register_btn = wx.Button(self, self.ID_START, label="Register")
         self.register_btn.Bind(wx.EVT_BUTTON, self.on_register, id=self.ID_START)
 
-        cancel_btn = wx.Button(self, self.ID_START, label="Cancel")
-        cancel_btn.Bind(wx.EVT_BUTTON, self.on_cancel, id=self.ID_START)
+        self.cancel_btn = wx.Button(self, self.ID_START, label="Cancel")
+        self.cancel_btn.Bind(wx.EVT_BUTTON, self.on_cancel, id=self.ID_START)
 
         btn_sizer.Add(self.register_btn, 0, wx.ALL, 5)
-        btn_sizer.Add(cancel_btn, 0, wx.ALL, 5)
+        btn_sizer.Add(self.cancel_btn, 0, wx.ALL, 5)
 
         # self.status = wx.StaticText(self, -1, '', pos=(0, 100))
         self.status = wx.StaticText(self, -1, '')
@@ -103,6 +103,7 @@ class RegisterDialog(wx.Dialog):
             self.status.SetLabel('Canceling...')
             self.status.SetPosition((int(self.GetSize()[0] / 2) - int(self.status.GetSize()[0] / 2), 40))
             self.worker.abort()
+            self.cancel_btn.Disable()
         else:
             self.Destroy()
 
@@ -110,7 +111,8 @@ class RegisterDialog(wx.Dialog):
         """Show Result status."""
         if event.data is None:
             # Thread aborted (using our convention of None return)
-            self.status.SetLabel('Computation aborted')
+            # self.status.SetLabel('Computation aborted')
+            self.Destroy()
         else:
             # Process results here
             self.status.SetLabel('Computation Result: %s' % event.data)
