@@ -33,8 +33,10 @@ class MainPanel(wx.Panel):
                            host=self.config['PROXY']['HOST'], port=self.config['PROXY']['PORT'],
                            url=self.config['PROXY']['URL'])
 
-        gsheets = GSheet("1gO3m2DJmO6Lwf27Wjustop9eyik9TGO5_9MeJZbetP0", "kijiji-362509-c751d3f68ea1.json")
-        self.main_sheet = gsheets.get_main_worksheet(0)
+        # gsheets = GSheet("1gO3m2DJmO6Lwf27Wjustop9eyik9TGO5_9MeJZbetP0", "kijiji-362509-c751d3f68ea1.json")
+        gsheets = GSheet(self.config['GOOGLE_SHEETS']['KEY'], self.config['GOOGLE_SHEETS']['KEYFILE_NAME'])
+        # self.main_sheet = gsheets.get_main_worksheet(0)
+        self.main_sheet = gsheets.get_main_worksheet(int(self.config['GOOGLE_SHEETS']['GID']))
         list_of_hashes = self.main_sheet.get_all_records()
         self.data = []
         for i in list_of_hashes:
@@ -81,7 +83,7 @@ class MainPanel(wx.Panel):
         self.SetSizer(mainSizer)
 
     def registerControl(self, event):
-        with RegisterDialog(self.proxy) as dlg:
+        with RegisterDialog(self.proxy, self.main_sheet) as dlg:
             dlg.ShowModal()
             self.updateSpreadsheet()
 

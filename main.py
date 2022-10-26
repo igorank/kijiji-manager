@@ -1,12 +1,6 @@
-import time
 import ctypes
 import wx
-from gsheet import GSheet
 from mainpanel import MainPanel
-from driver import Driver
-from proxy import Proxy
-from e_mail import Email
-from kijiji import Kijiji
 
 
 class MainFrame(wx.Frame):

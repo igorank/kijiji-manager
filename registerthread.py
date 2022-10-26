@@ -1,10 +1,8 @@
 import time
 from ipchanger import IPChanger
 import gsheet
-from proxy import Proxy
 from e_mail import Email
 from kijiji import Kijiji
-from gsheet import GSheet
 from threading import *
 from wx.lib.pubsub import pub
 from kijiji_api import KijijiApi
@@ -36,7 +34,7 @@ class ResultEvent(wx.PyEvent):
 
 
 class RegisterThread(Thread):
-    def __init__(self, notify_window, num, proxy):
+    def __init__(self, notify_window, num, proxy, main_sheet):
         Thread.__init__(self)
         # self.proxy = Proxy(username="SUV4FU", password="eT3PAwKEqavC", host="oproxy.site", port="10006",
         #               url="https://mobileproxy.space/reload.html?proxy_key=d7b59504de76caa1d494e882584cca74")
@@ -45,8 +43,7 @@ class RegisterThread(Thread):
         self._want_abort = 0
         self.k_api = KijijiApi(proxy=self.proxy)
         self.num = int(num)
-        gsheets = GSheet("1gO3m2DJmO6Lwf27Wjustop9eyik9TGO5_9MeJZbetP0", "kijiji-362509-c751d3f68ea1.json")
-        self.main_sheet = gsheets.get_main_worksheet(0)
+        self.main_sheet = main_sheet
         self.start()
 
     def run(self):
