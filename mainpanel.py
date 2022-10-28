@@ -38,43 +38,43 @@ class MainPanel(wx.Panel):
         list_of_hashes = self.main_sheet.get_all_records()
         self.data = []
         for i in list_of_hashes:
-            self.data.append(Account(i['User ID'], i['Email'], i['Kijiji password'], i['Email Password'], i['IMAP password'],
-                                     i['Forwarding to'], i['Token']))
+            self.data.append(Account(i['User ID'], i['Email'], i['Kijiji password'], i['Email Password'],
+                                     i['IMAP password'], i['Forwarding to'], i['Token']))
 
         self.dataOlv = ObjectListView(self, wx.ID_ANY, sortable=False, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         self.dataOlv.SetEmptyListMsg("No Profiles")
-        self.setData()
+        self.set_data()
         # Allow the cell values to be edited when double/single-clicked
         # self.dataOlv.cellEditMode = ObjectListView.CELLEDIT_SINGLECLICK
         # self.dataOlv.cellEditMode = ObjectListView.CELLEDIT_DOUBLECLICK
 
-        registerBtn = wx.Button(self, wx.ID_ANY, "Register")
-        registerBtn.Bind(wx.EVT_BUTTON, self.registerControl)
-        btn_sizer.Add(registerBtn, 0, wx.ALL, 5)
+        register_btn = wx.Button(self, wx.ID_ANY, "Register")
+        register_btn.Bind(wx.EVT_BUTTON, self.register_control)
+        btn_sizer.Add(register_btn, 0, wx.ALL, 5)
 
-        deleteBtn = wx.Button(self, wx.ID_ANY, "Delete")
-        deleteBtn.Bind(wx.EVT_BUTTON, self.deleteControl)
-        btn_sizer.Add(deleteBtn, 0, wx.ALL, 5)
+        delete_btn = wx.Button(self, wx.ID_ANY, "Delete")
+        delete_btn.Bind(wx.EVT_BUTTON, self.delete_control)
+        btn_sizer.Add(delete_btn, 0, wx.ALL, 5)
 
-        updateBtn = wx.Button(self, wx.ID_ANY, "Update")
-        updateBtn.Bind(wx.EVT_BUTTON, self.updateControl)
-        btn_sizer.Add(updateBtn, 0, wx.ALL, 5)
+        update_btn = wx.Button(self, wx.ID_ANY, "Update")
+        update_btn.Bind(wx.EVT_BUTTON, self.update_control)
+        btn_sizer.Add(update_btn, 0, wx.ALL, 5)
 
-        ViewBtn = wx.Button(self, wx.ID_ANY, "View Profile")
-        ViewBtn.Bind(wx.EVT_BUTTON, self.view_record)
-        btn_sizer.Add(ViewBtn, 0, wx.ALL, 5)
+        view_btn = wx.Button(self, wx.ID_ANY, "View Profile")
+        view_btn.Bind(wx.EVT_BUTTON, self.view_record)
+        btn_sizer.Add(view_btn, 0, wx.ALL, 5)
 
-        mainSizer = wx.BoxSizer(wx.VERTICAL)
-        mainSizer.Add(self.dataOlv, 1, wx.ALL | wx.EXPAND, 5)
-        mainSizer.Add(btn_sizer, 0, wx.CENTER)
-        self.SetSizer(mainSizer)
+        main_sizer = wx.BoxSizer(wx.VERTICAL)
+        main_sizer.Add(self.dataOlv, 1, wx.ALL | wx.EXPAND, 5)
+        main_sizer.Add(btn_sizer, 0, wx.CENTER)
+        self.SetSizer(main_sizer)
 
-    def registerControl(self, event):
+    def register_control(self, event):
         with RegisterDialog(self.config, self.proxy, self.main_sheet) as dlg:
             dlg.ShowModal()
-            self.updateSpreadsheet()
+            self.update_spreadsheet()
 
-    def deleteControl(self, event):
+    def delete_control(self, event):
         selected_row = self.dataOlv.GetSelectedObject()
         if not selected_row:
             helper.show_message('Please select one profile from the list!', 'Error')
@@ -84,7 +84,7 @@ class MainPanel(wx.Panel):
         self.main_sheet.delete_row(cell.row)
 
         # Update
-        self.updateSpreadsheet()
+        self.update_spreadsheet()
 
         helper.show_message("Profile has been deleted!", 'Deleted', wx.ICON_INFORMATION)
 
@@ -100,11 +100,11 @@ class MainPanel(wx.Panel):
         except Exception as e:
             helper.show_message(str(e), 'Error')
 
-    def updateControl(self, event):
-        self.updateSpreadsheet()
+    def update_control(self, event):
+        self.update_spreadsheet()
         helper.show_message("The table has been updated!", 'Updated', wx.ICON_INFORMATION)
 
-    def updateSpreadsheet(self):
+    def update_spreadsheet(self):
         list_of_hashes = self.main_sheet.get_all_records()
 
         self.data = []
@@ -115,7 +115,7 @@ class MainPanel(wx.Panel):
 
         self.dataOlv.SetObjects(self.data)
 
-    def setData(self):
+    def set_data(self):
         self.dataOlv.SetColumns([
             ColumnDefn("User ID", "left", 70, "user_id", minimumWidth=70),
             ColumnDefn("Email", "left", 213, "email", minimumWidth=213),

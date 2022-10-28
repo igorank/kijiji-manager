@@ -24,7 +24,7 @@ class RegisterThread(Thread):
         self.proxy = proxy
         self.config = config
         self._notify_window = notify_window
-        self._want_abort = 0
+        self.want_abort = 0
         self.k_api = KijijiApi(proxy=self.proxy)
         self.num = int(num)
         self.main_sheet = main_sheet
@@ -33,13 +33,13 @@ class RegisterThread(Thread):
         """Run Thread."""
         i = 0
         while i < self.num:
-            if self._want_abort:
+            if self.want_abort:
                 wx.PostEvent(self._notify_window, ResultEvent(None))
                 return
             wx.CallAfter(pub.sendMessage, "update", msg="")
             email = Email(self.config['WEBDRIVER']['PATH'], self.config['2CAPTCHA']['API_KEY'],
                           self.config['MAIL_FORWARDING']['EMAIL'], self.config['MAIL_FORWARDING']['PASSWORD'])
-            if self._want_abort:
+            if self.want_abort:
                 wx.PostEvent(self._notify_window, ResultEvent(None))
                 return
             wx.CallAfter(pub.sendMessage, "update", msg="")
@@ -53,7 +53,7 @@ class RegisterThread(Thread):
             wx.CallAfter(pub.sendMessage, "update", msg="")
 
             kijiji_acc = Kijiji(self.config['WEBDRIVER']['PATH'])
-            if self._want_abort:
+            if self.want_abort:
                 wx.PostEvent(self._notify_window, ResultEvent(None))
                 return
             kijiji_dict = kijiji_acc.register(self, self.proxy, email_dict['email'], email_dict['imap_pass'])
@@ -63,11 +63,11 @@ class RegisterThread(Thread):
             wx.CallAfter(pub.sendMessage, "update", msg="")
 
             user_id, token = self.get_token(email_dict['email'], kijiji_dict['password'])
-            if self._want_abort:
+            if self.want_abort:
                 wx.PostEvent(self._notify_window, ResultEvent(None))
                 return
 
-            ## Добавляем данные в таблицу
+            # Добавляем данные в таблицу
             empty_email_row = gsheet.get_empty_row_in_col(self.main_sheet, 2)
             self.main_sheet.update_cell(empty_email_row, 1, user_id)
             # Добавляем адр. почти в табл. (1 - стоблец с почт.)
@@ -82,13 +82,13 @@ class RegisterThread(Thread):
             self.main_sheet.update_cell(empty_email_row, 6, email_dict['forwarding_email'])
             # Добавляем UserAgent в табл. (6 - стоблец с пар. от почты)
             self.main_sheet.update_cell(empty_email_row, 7, email_dict['useragent'])
-            if self._want_abort:
+            if self.want_abort:
                 wx.PostEvent(self._notify_window, ResultEvent(None))
                 return
             wx.CallAfter(pub.sendMessage, "update", msg="")
             wx.CallAfter(pub.sendMessage, "update", msg="")
             self.main_sheet.update_cell(empty_email_row, 8, token)
-            if self._want_abort:
+            if self.want_abort:
                 wx.PostEvent(self._notify_window, ResultEvent(None))
                 return
             wx.CallAfter(pub.sendMessage, "update", msg="")
@@ -114,4 +114,4 @@ class RegisterThread(Thread):
     def abort(self):
         """Abort thread."""
         # Method for use by main thread to signal an abort
-        self._want_abort = 1
+        self.want_abort = 1

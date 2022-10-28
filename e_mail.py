@@ -56,7 +56,7 @@ class Email(Driver):
         while True:
             if last_email_id != 1:
                 break
-            if thread._want_abort:
+            if thread.want_abort:
                 return False
             time.sleep(1)
             last_email_id = guerrilla_mail.get_last_email_id()
@@ -73,7 +73,7 @@ class Email(Driver):
                 time.sleep(1)
                 it += 1
                 continue
-        if thread._want_abort:
+        if thread.want_abort:
             return 2
         return False
 
@@ -81,14 +81,14 @@ class Email(Driver):
     def get_imap_pass(driver, delay, thread):
         it = 0
         while it <= delay:
-            IMAP_pass = driver.find_element(By.ID,
+            imap_pass = driver.find_element(By.ID,
                                             "pop3-pass-field").get_attribute('value')
-            if len(IMAP_pass) == 0:
+            if len(imap_pass) == 0:
                 time.sleep(1)
                 continue
             else:
-                return IMAP_pass
-        if thread._want_abort:
+                return imap_pass
+        if thread.want_abort:
             return 1
         return False
 
@@ -134,22 +134,22 @@ class Email(Driver):
             name = random.choice(names)
             surname = random.choice(surnames)
             initialized = False
-            if thread._want_abort:
+            if thread.want_abort:
                 return False
             driver = self.setup_driver(proxy=proxy, twocaptcha_ext=True, headless=self.headless)
-            if thread._want_abort:
+            if thread.want_abort:
                 return False
             try:
-                if thread._want_abort:
+                if thread.want_abort:
                     return False
                 self.settings_captcha_solver(driver)
-                if thread._want_abort:
+                if thread.want_abort:
                     return False
                 initialized = True
-                if thread._want_abort:
+                if thread.want_abort:
                     return False
                 driver.get("https://login.inbox.lv/")
-                if thread._want_abort:
+                if thread.want_abort:
                     return False
                 driver.find_element("xpath",
                                     "/html/body/div[1]/article/form/fieldset/div[4]/a").click()
@@ -190,34 +190,35 @@ class Email(Driver):
                                     "/html/body/div[1]/article/div/div/div[2]/form/fieldset/div[3]/div[1]/div["
                                     "2]/label/input").click()
                 driver.find_element("xpath",
-                                    "/html/body/div[1]/article/div/div/div[2]/form/fieldset/div[3]/div[2]/button").click()
+                                    "/html/body/div[1]/article/div/div/div[2]/form/fieldset/div[3]/div[2]/button")\
+                    .click()
                 WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located(
                         (By.XPATH, "/html/body/div[5]/div/div/div[2]/div[2]/div[1]/img")))
-                if thread._want_abort:
+                if thread.want_abort:
                     return False
                 second_try = False
                 while True:
-                    if thread._want_abort:
+                    if thread.want_abort:
                         return False
                     time.sleep(2)  # TEMP solution (for image loading)
                     if second_try:
                         img = driver.find_element(By.XPATH, '//img[@class="captcha__img img-responsive"]')
                     else:
                         img = driver.find_element("xpath", "/html/body/div[5]/div/div/div[2]/div[2]/div[1]/img")
-                    img.screenshot('names\\' + str(username) + '.png')
+                    img.screenshot('cache\\' + str(username) + '.png')
                     try:
-                        result = solver.normal('names\\' + str(username) + '.png')
+                        result = solver.normal('cache\\' + str(username) + '.png')
                     except:
-                        if thread._want_abort:
+                        if thread.want_abort:
                             return False
-                        os.remove('names\\' + str(username) + '.png')
+                        os.remove('cache\\' + str(username) + '.png')
                         driver.close()
                         driver.quit()
                         IPChanger.change_ip(proxy.get_change_ip_url())
                         continue
 
-                    os.remove('names\\' + str(username) + '.png')
+                    os.remove('cache\\' + str(username) + '.png')
 
                     if second_try:
                         driver.find_element("xpath",
@@ -233,26 +234,26 @@ class Email(Driver):
                         WebDriverWait(driver, 6).until(
                             EC.invisibility_of_element_located(
                                 (By.XPATH, "/html/body/div[5]/div/div/div[2]/div[2]/div[1]/img")))
-                        if thread._want_abort:
+                        if thread.want_abort:
                             return False
                     except:
-                        if thread._want_abort:
+                        if thread.want_abort:
                             return False
                         solver.report(result['captchaId'], False)
                         continue
 
-                    if thread._want_abort:
+                    if thread.want_abort:
                         return False
-                    hCaptcha_result = check_hCaptcha(driver, thread)
-                    if hCaptcha_result == 1:
-                        if thread._want_abort:
+                    h_captcha_result = check_hcaptcha(driver, thread)
+                    if h_captcha_result == 1:
+                        if thread.want_abort:
                             return False
                         driver.find_element("xpath",
                                             "/html/body/div[1]/div[2]/div/div/div[2]/form/fieldset/div/button").click()
                         driver.get(
                             "https://email.inbox.lv/?utm_source=portal&utm_medium=vertical&utm_term=ru&utm_campaign"
                             "=toolbar")
-                        if thread._want_abort:
+                        if thread.want_abort:
                             return False
                         WebDriverWait(driver, 10).until(
                             EC.element_to_be_clickable(
@@ -261,24 +262,24 @@ class Email(Driver):
                                             "/html/body/div/div/div/div/div[5]/div/a").click()  # button next
                         driver.find_element("xpath",
                                             "/html/body/div/div/div/div/div[4]/a").click()  # button back
-                        if thread._want_abort:
+                        if thread.want_abort:
                             return False
                         email = guerrilla_mail.get_email_add()
-                        if thread._want_abort:
+                        if thread.want_abort:
                             return False
                         driver.find_element("xpath",
                                             "/html/body/div/div/div/div/form/fieldset/div/input").send_keys(
                             str(email))  # second email field
                         driver.find_element("xpath",
                                             "/html/body/div/div/div/div/div[3]/button").click()  # button next
-                        if thread._want_abort:
+                        if thread.want_abort:
                             return False
                         last_email_id = self.get_last_emailid(guerrilla_mail, thread)
                         if not last_email_id:
                             return False
                         email_body = guerrilla_mail.get_email_body(last_email_id)
                         ver_code = guerrilla_mail.get_inboxlv_code(email_body)
-                        if thread._want_abort:
+                        if thread.want_abort:
                             return False
                         driver.find_element("xpath",
                                             "/html/body/div/div/div/div/div[3]/div/form/div[1]/div[2]/input").send_keys(
@@ -303,7 +304,7 @@ class Email(Driver):
                                             "/html/body/div/div/div/div/form/div[4]/button").click()  # Next Button
                         driver.find_element("xpath",
                                             "/html/body/div/div/div/div/div[3]/div/a").click()  # Ready button
-                        if thread._want_abort:
+                        if thread.want_abort:
                             return False
                         WebDriverWait(driver, 20).until(EC.presence_of_element_located(
                             (By.XPATH, "/html/body/div[3]/nav/ul/li[7]/a")))  # settings button
@@ -322,55 +323,55 @@ class Email(Driver):
                                             "2]/div/button").click()
                         WebDriverWait(driver, 15).until(EC.presence_of_element_located(
                             (By.ID, "pop3-pass-field")))  # pop3-pass-field
-                        IMAP_pass = self.get_imap_pass(driver, 15, thread)
-                        if not IMAP_pass:
+                        imap_pass = self.get_imap_pass(driver, 15, thread)
+                        if not imap_pass:
                             driver.close()
                             driver.quit()
                             IPChanger.change_ip(proxy.get_change_ip_url())
                             continue
-                        elif IMAP_pass == 1:
+                        elif imap_pass == 1:
                             return False
                         driver.find_element("xpath", '//*[@id="pop3-pass-modal-submit"]').click()  # OK Button
-                        if thread._want_abort:
+                        if thread.want_abort:
                             return False
                         if self.forw_email and self.forw_email_pass:
-                            if thread._want_abort:
+                            if thread.want_abort:
                                 return False
                             forw_email = self.add_email_forwarding(driver, thread, self.forw_email,
                                                                    self.forw_email_pass)
                             if not forw_email:
                                 return False
-                            if thread._want_abort:
+                            if thread.want_abort:
                                 return False
                         else:
                             forw_email = ""
-                        if thread._want_abort:
+                        if thread.want_abort:
                             return False
                         self.successful_registrations += 1
                         driver.close()
                         driver.quit()
                         useragent = self.get_useragent()
-                        if thread._want_abort:
+                        if thread.want_abort:
                             return False
                         data = {'email': username + "@inbox.lv", 'email_pass': str(password),
-                                'imap_pass': str(IMAP_pass), 'useragent': useragent, 'forwarding_email': forw_email}
+                                'imap_pass': str(imap_pass), 'useragent': useragent, 'forwarding_email': forw_email}
                         return data
-                    elif hCaptcha_result == -1:
+                    elif h_captcha_result == -1:
                         driver.close()
                         driver.quit()
                         IPChanger.change_ip(proxy.get_change_ip_url())
                         break
-                    elif hCaptcha_result == 0:
+                    elif h_captcha_result == 0:
                         second_try = True
                         driver.find_element(By.XPATH, '//button[@class="btn btn-default"]').click()  # Отмена
                         WebDriverWait(driver, 10).until(EC.element_to_be_clickable(
                             (By.XPATH, '//*[@id="signup_submit"]')))
                         driver.find_element(By.XPATH, '//*[@id="signup_submit"]').click()
                         continue
-                    elif hCaptcha_result == 2:
+                    elif h_captcha_result == 2:
                         return False
             except:
-                if thread._want_abort:
+                if thread.want_abort:
                     return False
                 if initialized:
                     driver.close()
@@ -379,11 +380,11 @@ class Email(Driver):
                 continue
 
 
-def check_hCaptcha(driver, thread) -> int:
+def check_hcaptcha(driver, thread) -> int:
     it = 0
     while it < 90:
 
-        if thread._want_abort:
+        if thread.want_abort:
             return 2
 
         try:

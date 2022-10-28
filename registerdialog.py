@@ -3,6 +3,8 @@ import resultevent
 from helper import row_builder, show_message
 from registerthread import RegisterThread
 from wx.lib.pubsub import pub
+
+
 # from ipchanger import IPChanger
 
 
@@ -39,7 +41,7 @@ class RegisterDialog(wx.Dialog):
         # self.title_lbl.SetFont(font)
         self.title_txt = wx.TextCtrl(self, value="1", size=(65, -1))
         self.main_sizer.Add(row_builder([self.title_lbl, self.title_txt], 10),
-                       0, wx.ALL)
+                            0, wx.ALL)
 
         self.register_btn = wx.Button(self, self.ID_START, label="Register")
         self.register_btn.Bind(wx.EVT_BUTTON, self.on_register, id=self.ID_START)
@@ -59,7 +61,7 @@ class RegisterDialog(wx.Dialog):
 
         self.worker = None
 
-    def updateProgress(self, msg):
+    def update_progress(self, msg):
         self.count += 10
 
         if self.count >= (int(self.num_profiles) * 100):
@@ -81,12 +83,12 @@ class RegisterDialog(wx.Dialog):
             self.title_lbl.Destroy()
 
             self.status.SetLabel('Registering...')
-            self.status.SetPosition((int(self.GetSize()[0]/2) - int(self.status.GetSize()[0]/2), 40))
+            self.status.SetPosition((int(self.GetSize()[0] / 2) - int(self.status.GetSize()[0] / 2), 40))
             self.main_sizer.Add(self.status, 0, wx.CENTER, 5)
 
             # Запускаем поток регистрации
             self.worker = RegisterThread(self, self.config, self.num_profiles, self.proxy, self.main_sheet)
-            try:                # Перехват исключения не работает
+            try:  # Перехват исключения не работает
                 self.worker.start()
             except Exception as e:
                 show_message(str(e), 'Error')
@@ -94,7 +96,7 @@ class RegisterDialog(wx.Dialog):
 
             self.progress.Show()
             self.progress.SetRange((int(self.num_profiles)) * 100)
-            pub.subscribe(self.updateProgress, "update")
+            pub.subscribe(self.update_progress, "update")
             # self.main_sizer.Add(self.progress, 0, wx.CENTER, 5)
 
     def on_cancel(self, event):

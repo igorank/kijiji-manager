@@ -72,7 +72,7 @@ class KijijiApi:
         if r.status_code == 200:
             try:
                 user_id = doc['user:user-logins']['user:user-login']['user:id']
-                email = doc['user:user-logins']['user:user-login']['user:email']
+                # email = doc['user:user-logins']['user:user-login']['user:email']
                 token = doc['user:user-logins']['user:user-login']['user:token']
             except KeyError as e:
                 raise KijijiApiException(f"User ID and/or user token not found in response text: {e}")
@@ -96,7 +96,10 @@ class KijijiApi:
             # Query all ads
             url += '?size=50' \
                    '&page=0' \
-                   '&_in=id,title,price,ad-type,locations,ad-status,category,pictures,start-date-time,features-active,view-ad-count,user-id,phone,email,rank,ad-address,phone-click-count,map-view-count,ad-source-id,ad-channel-id,contact-methods,attributes,link,description,feature-group-active,end-date-time,extended-info,highest-price'
+                   '&_in=id,title,price,ad-type,locations,ad-status,category,pictures,start-date-time,' \
+                   'features-active,view-ad-count,user-id,phone,email,rank,ad-address,phone-click-count,' \
+                   'map-view-count,ad-source-id,ad-channel-id,contact-methods,attributes,link,description,' \
+                   'feature-group-active,end-date-time,extended-info,highest-price '
 
         r = self.session.get(url, headers=headers)
 
@@ -186,12 +189,9 @@ class KijijiApi:
             raise KijijiApiException(self._error_reason(self._parse_response(r.text)))
 
     def post_ad(self, user_id, token, data):
-        """Post new ad
-        No input validation is performed; incorrect inputs are expected to be reported back by Kijiji API after attempting to post
-        :param user_id: user ID number
-        :param token: session token
-        :param data: ad xml data
-        :return: new ad ID number
+        """Post new ad No input validation is performed; incorrect inputs are expected to be reported back by Kijiji
+        API after attempting to post :param user_id: user ID number :param token: session token :param data: ad xml
+        data :return: new ad ID number
         """
         headers = self._headers_with_auth(user_id, token)
         headers.update({'Content-Type': 'application/xml'})
@@ -217,7 +217,7 @@ class KijijiApi:
         """Upload image Kijiji mobile API
         :param user_id: user ID number
         :param token: session token
-        :param data: werkzeug.FileStorage type image object
+
         :return: full image URL
         """
 

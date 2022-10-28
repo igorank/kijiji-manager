@@ -18,7 +18,7 @@ class EmailReader:
     def get_verf_link(self, delay, thread):
         it = 0
         while it <= delay:
-            if thread._want_abort:
+            if thread.want_abort:
                 return -1
             messages = self.mb.fetch()
             for msg in messages:
@@ -36,7 +36,7 @@ class EmailReader:
     def get_forw_code(self, delay, thread):
         it = 0
         while it <= delay:
-            if thread._want_abort:
+            if thread.want_abort:
                 return -1
             messages = self.mb.fetch()
             for msg in messages:

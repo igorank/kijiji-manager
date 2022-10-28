@@ -18,7 +18,7 @@ class AD(object):
         self.end_date = end_date
 
 
-def dateConverter(string):
+def date_converter(string):
     try:
         x = string.split("T")
         return x[0] + ' ' + x[1][:8]
@@ -93,8 +93,8 @@ class ViewDialog(wx.Dialog):
 
         # if int(self.profile_info['user:user-profile']['user:user-active-ad-count']) > 0:
         #     self.ads = self.k_api.get_ad(self.user_id, self.token)
-        self.updateSpreadsheet()
-        self.setData()
+        self.update_spreadsheet()
+        self.set_data()
 
         post_ad_btn = wx.Button(self, label="Post Ad")
         post_ad_btn.Bind(wx.EVT_BUTTON, self.on_post)
@@ -122,13 +122,13 @@ class ViewDialog(wx.Dialog):
         else:
             show_message('Something went wrong! Please try again later.', 'Error')
 
-        self.updateSpreadsheet()
+        self.update_spreadsheet()
 
     def on_post(self, event):
-        with PostAdDialog(self.k_api, self.user_id, self.email, self.token, self.config, self.updateSpreadsheet) as dlg:
+        with PostAdDialog(self.k_api, self.user_id, self.email, self.token, self.config, self.update_spreadsheet) as dlg:
             dlg.ShowModal()
 
-    def updateSpreadsheet(self):
+    def update_spreadsheet(self):
         ads = self.k_api.get_ad(self.user_id, self.token)
 
         data = []
@@ -140,33 +140,33 @@ class ViewDialog(wx.Dialog):
                                        i['cat:category']['cat:id-name'],
                                        i['ad:price']['types:amount'],
                                        i['ad:view-ad-count'],
-                                       dateConverter(i['ad:start-date-time']),
-                                       dateConverter(i['ad:end-date-time'])))
+                                       date_converter(i['ad:start-date-time']),
+                                       date_converter(i['ad:end-date-time'])))
                     except KeyError:
                         data.append(AD(i['@id'], i['ad:title'],
                                        i['cat:category']['cat:id-name'],
                                        " ",
                                        i['ad:view-ad-count'],
-                                       dateConverter(i['ad:start-date-time']),
-                                       dateConverter(i['ad:end-date-time'])))
-            elif type(ads['ad:ads']['ad:ad']) is dict:                  # Если одна реклама
+                                       date_converter(i['ad:start-date-time']),
+                                       date_converter(i['ad:end-date-time'])))
+            elif type(ads['ad:ads']['ad:ad']) is dict:  # Если одна реклама
                 try:
                     data.append(AD(ads['ad:ads']['ad:ad']['@id'], ads['ad:ads']['ad:ad']['ad:title'],
                                    ads['ad:ads']['ad:ad']['cat:category']['cat:id-name'],
                                    ads['ad:ads']['ad:ad']['ad:price']['types:amount'],
                                    ads['ad:ads']['ad:ad']['ad:view-ad-count'],
-                                   dateConverter(ads['ad:ads']['ad:ad']['ad:start-date-time']),
-                                   dateConverter(ads['ad:ads']['ad:ad']['ad:end-date-time'])))
+                                   date_converter(ads['ad:ads']['ad:ad']['ad:start-date-time']),
+                                   date_converter(ads['ad:ads']['ad:ad']['ad:end-date-time'])))
                 except KeyError:
                     data.append(AD(ads['ad:ads']['ad:ad']['@id'], ads['ad:ads']['ad:ad']['ad:title'],
                                    ads['ad:ads']['ad:ad']['cat:category']['cat:id-name'],
                                    " ",
                                    ads['ad:ads']['ad:ad']['ad:view-ad-count'],
-                                   dateConverter(ads['ad:ads']['ad:ad']['ad:start-date-time']),
-                                   dateConverter(ads['ad:ads']['ad:ad']['ad:end-date-time'])))
+                                   date_converter(ads['ad:ads']['ad:ad']['ad:start-date-time']),
+                                   date_converter(ads['ad:ads']['ad:ad']['ad:end-date-time'])))
         self.dataOlv.SetObjects(data)
 
-    def setData(self):
+    def set_data(self):
         self.dataOlv.SetColumns([
             ColumnDefn("Ad ID", "left", 70, "ad_id", minimumWidth=70),
             ColumnDefn("Title", "left", 128, "title", minimumWidth=128),

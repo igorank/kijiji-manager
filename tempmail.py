@@ -15,6 +15,7 @@ class GuerrillaMail:
     def get_email_body(self, email_id):
         return str(self.session.get_email(email_id).body)
 
-    def get_inboxlv_code(self, email_body):
+    @staticmethod
+    def get_inboxlv_code(email_body):
         index = email_body.find("</span>")
         return email_body[index - 6:index]

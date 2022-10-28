@@ -6,11 +6,13 @@ from helper import show_message
 from helper import row_builder
 from picture import Picture
 from randdesc import RandomDescription
+
+
 # from kijiji_api import KijijiApiException
 
 
 # Добавить фильтр только для png jpg...
-def get_random_photos(path, num=1):          # 2 - коли
+def get_random_photos(path, num=1):  # 2 - коли
     files = os.listdir(path)
     files = [f for f in files if os.path.isfile(path + '/' + f)]  # Filtering only the files.
     photo_names = choices(files, k=num)
@@ -20,12 +22,12 @@ def get_random_photos(path, num=1):          # 2 - коли
 
 class PostAdDialog(wx.Dialog):
 
-    def __init__(self, kijiji_api, user_id, email, user_token, config, updateSpreadsheet):
+    def __init__(self, kijiji_api, user_id, email, user_token, config, update_spreadsheet):
         """Constructor"""
-        super().__init__(None, title="Post Ad", size=wx.Size(480, 530)) # Size(480, 640)
+        super().__init__(None, title="Post Ad", size=wx.Size(480, 530))
         self.config = config
 
-        self.updateSpreadsheet = updateSpreadsheet
+        self.updateSpreadsheet = update_spreadsheet
         self.kijiji_api = kijiji_api
         self.user_id = user_id
         self.email = email
@@ -65,7 +67,8 @@ class PostAdDialog(wx.Dialog):
         self.subcategories_list = wx.ComboBox(self, wx.ID_ANY, style=wx.CB_READONLY,
                                               choices=self.get_subcategories(self.main_cats_list.GetCurrentSelection()))
         if self.config['DEFAULT_AD']['SUBCATEGORY']:
-            self.subcategories_list.SetSelection(self.get_subcategories(self.main_cats_list.GetCurrentSelection()).index(self.config['DEFAULT_AD']['SUBCATEGORY']))
+            self.subcategories_list.SetSelection(self.get_subcategories(self.main_cats_list.GetCurrentSelection()).
+                                                 index(self.config['DEFAULT_AD']['SUBCATEGORY']))
         else:
             self.subcategories_list.SetSelection(0)
         self.subcategories_list.Bind(wx.EVT_COMBOBOX, self.update_categories)
@@ -82,19 +85,22 @@ class PostAdDialog(wx.Dialog):
             self.categories_list.Enable()
             if self.config['DEFAULT_AD']['CATEGORY']:
                 self.categories_list.SetSelection(self.get_categories(self.main_cats_list.GetCurrentSelection(),
-                                                                  self.subcategories_list.GetCurrentSelection()).index(self.config['DEFAULT_AD']['CATEGORY']))
+                                                                      self.subcategories_list.GetCurrentSelection()).index(
+                    self.config['DEFAULT_AD']['CATEGORY']))
             else:
                 self.categories_list.SetSelection(0)
         main_sizer.Add(row_builder([categories_lbl, self.categories_list]))
 
         description_lbl = wx.StaticText(self, label="Description :")
         description_lbl.SetFont(font)
-        self.description = wx.TextCtrl(self, value=RandomDescription(self.config['DEFAULT_AD']['DESCRIPTION_FOLDER']) if self.config['DEFAULT_AD']['DESCRIPTION_FOLDER'] else "", size=(400, 150), style=wx.TE_MULTILINE)
+        self.description = wx.TextCtrl(self, value=RandomDescription(self.config['DEFAULT_AD']['DESCRIPTION_FOLDER']) if
+        self.config['DEFAULT_AD']['DESCRIPTION_FOLDER'] else "", size=(400, 150), style=wx.TE_MULTILINE)
         main_sizer.Add(row_builder([description_lbl, self.description]))
 
         photo_folder_lbl = wx.StaticText(self, label="Folder with Images :")
         photo_folder_lbl.SetFont(font)
-        self.photo_folder = wx.DirPickerCtrl(self, id=wx.ID_ANY, path=self.config['DEFAULT_AD']['IMAGES_FOLDER'] if self.config['DEFAULT_AD']['IMAGES_FOLDER'] else "",
+        self.photo_folder = wx.DirPickerCtrl(self, id=wx.ID_ANY, path=self.config['DEFAULT_AD']['IMAGES_FOLDER'] if
+        self.config['DEFAULT_AD']['IMAGES_FOLDER'] else "",
                                              message="Choose pictures directory", style=wx.DIRP_DEFAULT_STYLE,
                                              size=(400, -1))
         main_sizer.Add(row_builder([photo_folder_lbl, self.photo_folder]))
@@ -104,7 +110,8 @@ class PostAdDialog(wx.Dialog):
         self.locations_list = wx.ComboBox(self, wx.ID_ANY, size=(400, -1), style=wx.CB_READONLY,
                                           choices=self.locs_to_strings(sub_locations))
         if self.config['DEFAULT_AD']['LOCATION']:
-            self.locations_list.SetSelection(self.locs_to_strings(sub_locations).index(self.config['DEFAULT_AD']['LOCATION']))
+            self.locations_list.SetSelection(
+                self.locs_to_strings(sub_locations).index(self.config['DEFAULT_AD']['LOCATION']))
         else:
             self.locations_list.SetSelection(0)
         main_sizer.Add(row_builder([locations_lbl, self.locations_list]))
@@ -135,7 +142,8 @@ class PostAdDialog(wx.Dialog):
 
     def post(self, event):
 
-        photos_name_list = get_random_photos(self.photo_folder.GetPath(), int(self.config['DEFAULT_AD']['IMAGES_NUM'])) # второй аргумент - количество картинок
+        photos_name_list = get_random_photos(self.photo_folder.GetPath(), int(
+            self.config['DEFAULT_AD']['IMAGES_NUM']))  # второй аргумент - количество картинок
         photos_list = []
         for i in photos_name_list:
             photos_list.append(Picture(i, self.photo_folder.GetPath()))
@@ -170,7 +178,8 @@ class PostAdDialog(wx.Dialog):
                     'types:radius': 400,
                     'types:latitude': str(location.latitude),
                     'types:longitude': str(location.longitude),
-                    'types:full-address': self.fulladdress.GetValue(), # 'Norfolk County Hwy 59, Port Rowan, ON N0E 1M0'
+                    'types:full-address': self.fulladdress.GetValue(),
+                    # 'Norfolk County Hwy 59, Port Rowan, ON N0E 1M0'
                     'types:zip-code': zip_code,
                 },
                 'ad:visible-on-map': 'true',  # appears to make no difference if set to 'true' or 'false'
@@ -211,8 +220,9 @@ class PostAdDialog(wx.Dialog):
             id_name = self.categories_list.GetString(self.categories_list.GetCurrentSelection())
             res = None
             for i in \
-            self.cats['cat:categories']['cat:category']['cat:category'][self.main_cats_list.GetCurrentSelection()][
-                'cat:category'][self.subcategories_list.GetCurrentSelection()]['cat:category']:
+                    self.cats['cat:categories']['cat:category']['cat:category'][
+                        self.main_cats_list.GetCurrentSelection()][
+                        'cat:category'][self.subcategories_list.GetCurrentSelection()]['cat:category']:
                 if i['cat:id-name'] == id_name:
                     res = i
                     break
@@ -221,8 +231,9 @@ class PostAdDialog(wx.Dialog):
             id_name = self.subcategories_list.GetString(self.subcategories_list.GetCurrentSelection())
             res = None
             for i in \
-            self.cats['cat:categories']['cat:category']['cat:category'][self.main_cats_list.GetCurrentSelection()][
-                'cat:category']:
+                    self.cats['cat:categories']['cat:category']['cat:category'][
+                        self.main_cats_list.GetCurrentSelection()][
+                        'cat:category']:
                 if i['cat:id-name'] == id_name:
                     res = i
                     break
@@ -250,7 +261,7 @@ class PostAdDialog(wx.Dialog):
 
     def update_subcategories(self, event):
         if self.main_cats_list.GetCurrentSelection() == 4:
-            self.price.Disable()        # Выключаем поле Price, если выбрана категория Services
+            self.price.Disable()  # Выключаем поле Price, если выбрана категория Services
         else:
             self.price.Enable()
 
@@ -273,8 +284,7 @@ class PostAdDialog(wx.Dialog):
     def get_categories(self, index, index2):
         if 'cat:category' in self.cats['cat:categories']['cat:category']['cat:category'][index]['cat:category'][index2]:
             categories = []
-            for i in self.cats['cat:categories']['cat:category']['cat:category'][index]['cat:category'][index2][
-                'cat:category']:
+            for i in self.cats['cat:categories']['cat:category']['cat:category'][index]['cat:category'][index2]['cat:category']:
                 categories.append(i['cat:id-name'])
             return categories
         else:
@@ -292,7 +302,8 @@ class PostAdDialog(wx.Dialog):
             locs.append(i['loc:localized-name'])
         return locs
 
-    def locs_to_strings(self, sub_locs) -> list:
+    @staticmethod
+    def locs_to_strings(sub_locs) -> list:
         list_of_strings = []
         for key, value in sub_locs.items():
             for i, j in enumerate(value):
@@ -319,8 +330,7 @@ class PostAdDialog(wx.Dialog):
                     if 'loc:location' not in j:
                         locs[keys[int(i)]].append(j['loc:localized-name'])
                     else:
-                        sub_locs = {}
-                        sub_locs[j['loc:localized-name']] = []
+                        sub_locs = {j['loc:localized-name']: []}
                         for index2, k in enumerate(j['loc:location']):
                             if type(k) is dict:
                                 sub_locs[j['loc:localized-name']].append(k['loc:localized-name'])

@@ -35,19 +35,19 @@ class Kijiji(Driver):
             data['email'] = email
 
             driver = self.setup_driver(proxy=proxy, undetected=True, twocaptcha_ext=False, headless=True)
-            if thread._want_abort:
+            if thread.want_abort:
                 driver.close()
                 driver.quit()
                 return False
 
             driver.get("https://www.kijiji.ca/t-user-registration.html")
-            if thread._want_abort:
+            if thread.want_abort:
                 driver.close()
                 driver.quit()
                 return False
 
             while True:
-                if thread._want_abort:
+                if thread.want_abort:
                     driver.close()
                     driver.quit()
                     return False
@@ -70,7 +70,7 @@ class Kijiji(Driver):
 
             driver.find_element(By.XPATH, '//*[@id="email"]').send_keys(
                 email)
-            if thread._want_abort:
+            if thread.want_abort:
                 driver.close()
                 driver.quit()
                 return False
@@ -83,7 +83,7 @@ class Kijiji(Driver):
                 password)
 
             driver.find_element(By.XPATH, '//*[@id="mainPageContent"]/div/div/div/div/div/div/main/form/button').click()
-            if thread._want_abort:
+            if thread.want_abort:
                 driver.close()
                 driver.quit()
                 return False
@@ -94,7 +94,7 @@ class Kijiji(Driver):
                     or driver.find_elements(By.XPATH, '//*[@id="Homepage"]/div[1]/span/div/button'))
                 break
             except:
-                if thread._want_abort:
+                if thread.want_abort:
                     driver.close()
                     driver.quit()
                     return False
@@ -104,7 +104,7 @@ class Kijiji(Driver):
                 driver.quit()
                 continue
 
-        if thread._want_abort:
+        if thread.want_abort:
             driver.close()
             driver.quit()
             return False
@@ -119,7 +119,7 @@ class Kijiji(Driver):
         cookies = get_cookies(driver)
         data['cookies'] = cookies
         driver.get(verf_link)
-        if thread._want_abort:
+        if thread.want_abort:
             driver.close()
             driver.quit()
             return False
@@ -127,7 +127,7 @@ class Kijiji(Driver):
         driver.close()
         driver.quit()
 
-        if thread._want_abort:
+        if thread.want_abort:
             driver.close()
             driver.quit()
             return False
