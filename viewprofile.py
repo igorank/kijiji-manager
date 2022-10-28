@@ -156,12 +156,20 @@ class ViewDialog(wx.Dialog):
                                        dateConverter(i['ad:start-date-time']),
                                        dateConverter(i['ad:end-date-time'])))
             elif type(ads['ad:ads']['ad:ad']) is dict:                  # Если одна реклама
-                data.append(AD(ads['ad:ads']['ad:ad']['@id'], ads['ad:ads']['ad:ad']['ad:title'],
-                               ads['ad:ads']['ad:ad']['cat:category']['cat:id-name'],
-                               ads['ad:ads']['ad:ad']['ad:price']['types:amount'],
-                               ads['ad:ads']['ad:ad']['ad:view-ad-count'],
-                               dateConverter(ads['ad:ads']['ad:ad']['ad:start-date-time']),
-                               dateConverter(ads['ad:ads']['ad:ad']['ad:end-date-time'])))
+                try:
+                    data.append(AD(ads['ad:ads']['ad:ad']['@id'], ads['ad:ads']['ad:ad']['ad:title'],
+                                   ads['ad:ads']['ad:ad']['cat:category']['cat:id-name'],
+                                   ads['ad:ads']['ad:ad']['ad:price']['types:amount'],
+                                   ads['ad:ads']['ad:ad']['ad:view-ad-count'],
+                                   dateConverter(ads['ad:ads']['ad:ad']['ad:start-date-time']),
+                                   dateConverter(ads['ad:ads']['ad:ad']['ad:end-date-time'])))
+                except KeyError:
+                    data.append(AD(ads['ad:ads']['ad:ad']['@id'], ads['ad:ads']['ad:ad']['ad:title'],
+                                   ads['ad:ads']['ad:ad']['cat:category']['cat:id-name'],
+                                   " ",
+                                   ads['ad:ads']['ad:ad']['ad:view-ad-count'],
+                                   dateConverter(ads['ad:ads']['ad:ad']['ad:start-date-time']),
+                                   dateConverter(ads['ad:ads']['ad:ad']['ad:end-date-time'])))
         self.dataOlv.SetObjects(data)
 
     def setData(self):

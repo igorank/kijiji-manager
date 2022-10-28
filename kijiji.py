@@ -31,19 +31,31 @@ class Kijiji(Driver):
         self.names = FileManager.get_filesdata('names\\names_eng.txt')
         self.surnames = FileManager.get_filesdata('names\\surnames_eng.txt')
 
-    def register(self, proxy, email, imap_pass) -> dict:
+    def register(self, thread, proxy, email, imap_pass):
         data = dict()
         data['email'] = email
 
-        print('Setting up the driver.', end=' ')
+        #print('Setting up the driver.', end=' ')
         driver = self.setup_driver(proxy=proxy, undetected=True, twocaptcha_ext=False, headless=False)
-        print('Done.')
+        if thread._want_abort:
+            driver.close()
+            driver.quit()
+            return False
+        #print('Done.')
 
         driver.get("https://www.kijiji.ca/t-user-registration.html")
+        if thread._want_abort:
+            driver.close()
+            driver.quit()
+            return False
         # WebDriverWait(driver, 20).until(
         #     EC.presence_of_element_located((By.XPATH,
         #                                     '//*[@id="MainContainer"]/div[1]/div/div[2]/div/header/div[3]/div/div[3]/div/div/div/a[1]')))
         while True:
+            if thread._want_abort:
+                driver.close()
+                driver.quit()
+                return False
             try:
                 WebDriverWait(driver, 20).until(
                     EC.presence_of_element_located((By.XPATH, '//*[@id="profileName"]')))
@@ -60,7 +72,10 @@ class Kijiji(Driver):
 
         driver.find_element(By.XPATH, '//*[@id="email"]').send_keys(
             email)
-
+        if thread._want_abort:
+            driver.close()
+            driver.quit()
+            return False
         password = RandomGenerator.random_password(8) + random_upper_letter() + '_' + str(random.randint(10, 99))
         data['password'] = password
         driver.find_element(By.XPATH, '//*[@id="password"]').send_keys(
@@ -69,16 +84,27 @@ class Kijiji(Driver):
             password)
 
         driver.find_element(By.XPATH, '//*[@id="mainPageContent"]/div/div/div/div/div/div/main/form/button').click()
-
+        if thread._want_abort:
+            driver.close()
+            driver.quit()
+            return False
         # WebDriverWait(self.driver, 20).until(
         #     EC.presence_of_element_located((By.XPATH, '//*[@id="LocUpdate"]')))     # проверка регистрации
 
         mail_reader = EmailReader("mail.inbox.lv", email, imap_pass)
-        verf_link = mail_reader.get_verf_link(120)
+        verf_link = mail_reader.get_verf_link(120, thread)
+        if verf_link == -1:
+            driver.close()
+            driver.quit()
+            return False
         # print(verf_link)
         cookies = get_cookies(driver)
         data['cookies'] = cookies
         driver.get(verf_link)
+        if thread._want_abort:
+            driver.close()
+            driver.quit()
+            return False
         driver.close()
         driver.quit()
 

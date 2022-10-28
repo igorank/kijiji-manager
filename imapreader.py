@@ -15,9 +15,11 @@ class EmailReader:
         super().__init__()
         self.mb = MailBox(server).login(str(email), str(password))
 
-    def get_verf_link(self, delay):
+    def get_verf_link(self, delay, thread):
         it = 0
         while it <= delay:
+            if thread._want_abort:
+                return -1
             messages = self.mb.fetch()
             for msg in messages:
                 if msg.from_ == "donot-reply@kijiji.ca":
@@ -31,9 +33,11 @@ class EmailReader:
             it += 1
         return False
 
-    def get_forw_code(self, delay):
+    def get_forw_code(self, delay, thread):
         it = 0
         while it <= delay:
+            if thread._want_abort:
+                return -1
             messages = self.mb.fetch()
             for msg in messages:
                 if msg.from_ == "support@inbox.lv":
