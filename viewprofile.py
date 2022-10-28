@@ -40,15 +40,12 @@ class ViewDialog(wx.Dialog):
         self.k_api = KijijiApi(proxy=proxy)
         self.profile_info = self.k_api.get_profile(self.user_id, self.token)
 
-        # create the sizers
         main_sizer = wx.BoxSizer(wx.VERTICAL)
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        # create some fonts
         font = wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD)
         font_2 = wx.Font(10, wx.SWISS, wx.NORMAL, wx.NORMAL)
 
-        # create some text
         profileid_lbl = wx.StaticText(self, label="User ID :")
         profileid_lbl.SetFont(font)
         self.profileid = wx.StaticText(self, label=self.profile_info['user:user-profile']['user:user-id'])
@@ -131,11 +128,8 @@ class ViewDialog(wx.Dialog):
         with PostAdDialog(self.k_api, self.user_id, self.email, self.token, self.config, self.updateSpreadsheet) as dlg:
             dlg.ShowModal()
 
-        # self.updateSpreadsheet()
-
     def updateSpreadsheet(self):
         ads = self.k_api.get_ad(self.user_id, self.token)
-        print(ads) # TEMP
 
         data = []
         if 'ad:ad' in ads['ad:ads']:

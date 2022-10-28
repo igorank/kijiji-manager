@@ -28,10 +28,9 @@ class RegisterThread(Thread):
         self.k_api = KijijiApi(proxy=self.proxy)
         self.num = int(num)
         self.main_sheet = main_sheet
-        self.start()
 
     def run(self):
-        """Run Worker Thread."""
+        """Run Thread."""
         i = 0
         while i < self.num:
             if self._want_abort:
@@ -51,7 +50,6 @@ class RegisterThread(Thread):
             wx.CallAfter(pub.sendMessage, "update", msg="")
             del email
             wx.CallAfter(pub.sendMessage, "update", msg="")
-            # print(email_dict)
             wx.CallAfter(pub.sendMessage, "update", msg="")
 
             kijiji_acc = Kijiji(self.config['WEBDRIVER']['PATH'])
@@ -114,6 +112,6 @@ class RegisterThread(Thread):
         return user_id, token
 
     def abort(self):
-        """abort worker thread."""
+        """Abort thread."""
         # Method for use by main thread to signal an abort
         self._want_abort = 1

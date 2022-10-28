@@ -67,7 +67,6 @@ class KijijiApi:
         }
 
         r = self.session.post(f'{self.base_url}/users/login', headers=headers, data=payload)
-        # print(r.text)
         doc = self._parse_response(r.text)
 
         if r.status_code == 200:
@@ -161,7 +160,6 @@ class KijijiApi:
 
     @staticmethod
     def geo_location(postal_code):
-        # pgeocode.Nominatim.query_postal_code only uses the first three characters to do the lookup for Canadian postal codes
         postalcode = postal_code[:3]
         try:
             nomi = pgeocode.Nominatim('ca')
@@ -240,7 +238,7 @@ class KijijiApi:
         files = {
             'bucketAlias': (None, b'ca-prod-fsbo-ads'),
             'objectExpiration': (None, str(expiration_timestamp).encode('utf-8')),
-            'file': (data.filename, data.read(), data.content_type), # original
+            'file': (data.filename, data.read(), data.content_type),  # original
             # 'file': (filename, stream, content_type),
         }
 

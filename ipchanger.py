@@ -4,20 +4,13 @@ import requests
 class IPChanger:
 
     @staticmethod
-    def change_ip(url, get_ip=False, username=None, password=None, host=None, port=None):
+    def change_ip(url):
         if len(url) != 0:
             try:
-                print('Changing the IP address.', end=' ')
                 requests.get(url, timeout=12)
-                if get_ip:
-                    ip = IPChanger.get_ip(username, password, host, port)
-                    print(f"Done ({str(ip)}).")
-                else:
-                    print("Done.")
             except:
-                print("Failed.")
+                pass
         else:
-            print("IP address has not been changed")
             return
 
     @staticmethod

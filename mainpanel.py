@@ -33,9 +33,7 @@ class MainPanel(wx.Panel):
                            host=self.config['PROXY']['HOST'], port=self.config['PROXY']['PORT'],
                            url=self.config['PROXY']['URL'])
 
-        # gsheets = GSheet("1gO3m2DJmO6Lwf27Wjustop9eyik9TGO5_9MeJZbetP0", "kijiji-362509-c751d3f68ea1.json")
         gsheets = GSheet(self.config['GOOGLE_SHEETS']['KEY'], self.config['GOOGLE_SHEETS']['KEYFILE_NAME'])
-        # self.main_sheet = gsheets.get_main_worksheet(0)
         self.main_sheet = gsheets.get_main_worksheet(int(self.config['GOOGLE_SHEETS']['GID']))
         list_of_hashes = self.main_sheet.get_all_records()
         self.data = []
@@ -44,41 +42,30 @@ class MainPanel(wx.Panel):
                                      i['Forwarding to'], i['Token']))
 
         self.dataOlv = ObjectListView(self, wx.ID_ANY, sortable=False, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
-        # self.dataOlv.SetEmptyListMsg("No Records Found")
+        self.dataOlv.SetEmptyListMsg("No Profiles")
         self.setData()
         # Allow the cell values to be edited when double/single-clicked
         # self.dataOlv.cellEditMode = ObjectListView.CELLEDIT_SINGLECLICK
         # self.dataOlv.cellEditMode = ObjectListView.CELLEDIT_DOUBLECLICK
 
-        # create an register button
         registerBtn = wx.Button(self, wx.ID_ANY, "Register")
         registerBtn.Bind(wx.EVT_BUTTON, self.registerControl)
         btn_sizer.Add(registerBtn, 0, wx.ALL, 5)
 
-        # create delete button
         deleteBtn = wx.Button(self, wx.ID_ANY, "Delete")
         deleteBtn.Bind(wx.EVT_BUTTON, self.deleteControl)
         btn_sizer.Add(deleteBtn, 0, wx.ALL, 5)
 
-        # create an update button
         updateBtn = wx.Button(self, wx.ID_ANY, "Update")
         updateBtn.Bind(wx.EVT_BUTTON, self.updateControl)
         btn_sizer.Add(updateBtn, 0, wx.ALL, 5)
 
-        # create an update button
         ViewBtn = wx.Button(self, wx.ID_ANY, "View Profile")
         ViewBtn.Bind(wx.EVT_BUTTON, self.view_record)
         btn_sizer.Add(ViewBtn, 0, wx.ALL, 5)
 
-        # create an edit button
-        # edit_record_btn = wx.Button(self, label="Post Ad")
-        # edit_record_btn.Bind(wx.EVT_BUTTON, self.edit_record)
-        # btn_sizer.Add(edit_record_btn, 0, wx.ALL, 5)
-
-        # Create some sizers
         mainSizer = wx.BoxSizer(wx.VERTICAL)
         mainSizer.Add(self.dataOlv, 1, wx.ALL | wx.EXPAND, 5)
-        # mainSizer.Add(updateBtn, 0, wx.ALL | wx.CENTER, 5)
         mainSizer.Add(btn_sizer, 0, wx.CENTER)
         self.SetSizer(mainSizer)
 
@@ -101,38 +88,21 @@ class MainPanel(wx.Panel):
 
         helper.show_message("Profile has been deleted!", 'Deleted', wx.ICON_INFORMATION)
 
-    # def edit_record(self, event):
-    #     selected_row = self.dataOlv.GetSelectedObject()
-    #     # selected_rows = self.dataOlv.GetSelectedObjects()
-    #     if not selected_row:
-    #         dialogs.show_message('No row selected!', 'Error')
-    #         return
-    #
-    #     with dialogs.RecordDialog(selected_row,
-    #                               title='Post',
-    #                               addRecord=False) as dlg:
-    #         dlg.ShowModal()
-    #
-    #     # self.show_all_records()
-
     def view_record(self, event):
         selected_row = self.dataOlv.GetSelectedObject()
-        # selected_rows = self.dataOlv.GetSelectedObjects()
         if not selected_row:
             helper.show_message('Please select one profile from the list!', 'Error')
             return
 
-        #try:
-        with ViewDialog(selected_row, self.config, self.proxy) as dlg:
-            dlg.ShowModal()
-        # except Exception as e:
-        #     helper.show_message(str(e), 'Error')
-
-        # self.show_all_records()
+        try:
+            with ViewDialog(selected_row, self.config, self.proxy) as dlg:
+                dlg.ShowModal()
+        except Exception as e:
+            helper.show_message(str(e), 'Error')
 
     def updateControl(self, event):
         self.updateSpreadsheet()
-        helper.show_message("The spreadsheet has been updated!", 'Updated', wx.ICON_INFORMATION)
+        helper.show_message("The table has been updated!", 'Updated', wx.ICON_INFORMATION)
 
     def updateSpreadsheet(self):
         list_of_hashes = self.main_sheet.get_all_records()

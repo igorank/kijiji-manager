@@ -52,4 +52,3 @@ class EmailReader:
             time.sleep(1)
             it += 1
         return False
-

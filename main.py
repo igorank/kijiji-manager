@@ -7,7 +7,7 @@ class MainFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self, parent=None, id=wx.ID_ANY,
                           title="Kijiji Manager", size=(800, 600))
-        panel = MainPanel(self)
+        MainPanel(self)
 
         # Устанавливаем иконку
         self.SetIcon(wx.Icon("icon.ico"))

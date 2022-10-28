@@ -1,10 +1,9 @@
-import time
-
 import wx
 import resultevent
 from helper import row_builder, show_message
 from registerthread import RegisterThread
 from wx.lib.pubsub import pub
+# from ipchanger import IPChanger
 
 
 class RegisterDialog(wx.Dialog):
@@ -24,7 +23,6 @@ class RegisterDialog(wx.Dialog):
 
         self.num_profiles = None
 
-        # create the sizers
         size = (-1, -1)
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
         # author_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -36,7 +34,6 @@ class RegisterDialog(wx.Dialog):
         # pub.subscribe(self.updateProgress, "update")
         self.main_sizer.Add(self.progress, 0, wx.CENTER | wx.ALL, 10)
 
-        # create some widgets
         # font = wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD)
         self.title_lbl = wx.StaticText(self, label="Number of Profiles :", size=size)
         # self.title_lbl.SetFont(font)
@@ -58,7 +55,7 @@ class RegisterDialog(wx.Dialog):
         self.main_sizer.Add(btn_sizer, 0, wx.CENTER)
         self.SetSizerAndFit(self.main_sizer)
 
-        resultevent.EVT_RESULT(self, self.OnResult)
+        resultevent.EVT_RESULT(self, self.on_result)
 
         self.worker = None
 
@@ -89,6 +86,11 @@ class RegisterDialog(wx.Dialog):
 
             # Запускаем поток регистрации
             self.worker = RegisterThread(self, self.config, self.num_profiles, self.proxy, self.main_sheet)
+            try:                # Перехват исключения не работает
+                self.worker.start()
+            except Exception as e:
+                show_message(str(e), 'Error')
+                self.Destroy()
 
             self.progress.Show()
             self.progress.SetRange((int(self.num_profiles)) * 100)
@@ -107,7 +109,7 @@ class RegisterDialog(wx.Dialog):
         else:
             self.Destroy()
 
-    def OnResult(self, event):
+    def on_result(self, event):
         """Show Result status."""
         if event.data is None:
             # Thread aborted (using our convention of None return)

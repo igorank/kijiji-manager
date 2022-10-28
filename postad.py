@@ -23,8 +23,6 @@ class PostAdDialog(wx.Dialog):
     def __init__(self, kijiji_api, user_id, email, user_token, config, updateSpreadsheet):
         """Constructor"""
         super().__init__(None, title="Post Ad", size=wx.Size(480, 530)) # Size(480, 640)
-        # self.config = configparser.ConfigParser()
-        # self.config.read('config.ini')
         self.config = config
 
         self.updateSpreadsheet = updateSpreadsheet
@@ -36,27 +34,15 @@ class PostAdDialog(wx.Dialog):
         sub_locations = self.get_sub_locations()
         # Категории
         self.cats = kijiji_api.get_categories(user_id, user_token)
-        # print(self.cats) #TEMP
-        # print(cats['cat:categories']['cat:category']['cat:category'][0]['cat:category'])
-        # print(self.cats['cat:categories']['cat:category']['cat:category'][0]['cat:category'][1])
         main_cats = []
         for i in self.cats['cat:categories']['cat:category']['cat:category']:
             main_cats.append(i['cat:id-name'])
-            # print(i['cat:id-name'])
         main_cats.pop()
-        # print(type(self.cats))
 
-        # #Локация TEMP
-        # locs = kijiji_api.get_locations(user_id, user_token)
-        # print(locs)
-
-        # create the sizers
         main_sizer = wx.BoxSizer(wx.VERTICAL)
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        # create some fonts
         font = wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD)
-        font_2 = wx.Font(10, wx.SWISS, wx.NORMAL, wx.NORMAL)
 
         title_lbl = wx.StaticText(self, label="Title :")
         title_lbl.SetFont(font)
@@ -64,24 +50,20 @@ class PostAdDialog(wx.Dialog):
         self.title.SetMaxLength(64)
         main_sizer.Add(row_builder([title_lbl, self.title]))
 
-        # create some text
         category_lbl = wx.StaticText(self, label="Main Category :")
         category_lbl.SetFont(font)
         self.main_cats_list = wx.Choice(self, wx.ID_ANY, choices=main_cats)
-        # self.main_cats_list.SetSelection(0)
         if self.config['DEFAULT_AD']['MAIN_CATEGORY']:
             self.main_cats_list.SetSelection(main_cats.index(self.config['DEFAULT_AD']['MAIN_CATEGORY']))
         else:
             self.main_cats_list.SetSelection(0)
         self.main_cats_list.Bind(wx.EVT_CHOICE, self.update_subcategories)
-        # self.main_cats_list.Bind(wx.EVT_CHOICE, self.update_categories)
         main_sizer.Add(row_builder([category_lbl, self.main_cats_list]))
 
         subcategories_lbl = wx.StaticText(self, label="Subcategory :")
         subcategories_lbl.SetFont(font)
         self.subcategories_list = wx.ComboBox(self, wx.ID_ANY, style=wx.CB_READONLY,
                                               choices=self.get_subcategories(self.main_cats_list.GetCurrentSelection()))
-        # self.subcategories_list.SetSelection(0)
         if self.config['DEFAULT_AD']['SUBCATEGORY']:
             self.subcategories_list.SetSelection(self.get_subcategories(self.main_cats_list.GetCurrentSelection()).index(self.config['DEFAULT_AD']['SUBCATEGORY']))
         else:
@@ -98,15 +80,11 @@ class PostAdDialog(wx.Dialog):
             self.categories_list.Disable()
         else:
             self.categories_list.Enable()
-            # self.categories_list.SetSelection(0)
             if self.config['DEFAULT_AD']['CATEGORY']:
                 self.categories_list.SetSelection(self.get_categories(self.main_cats_list.GetCurrentSelection(),
                                                                   self.subcategories_list.GetCurrentSelection()).index(self.config['DEFAULT_AD']['CATEGORY']))
             else:
                 self.categories_list.SetSelection(0)
-        # self.main_cats_list.Bind(wx.EVT_CHOICE, self.update_categories)
-        # self.main_cats_list.Bind(wx.EVT_COMBOBOX, self.update_categories)
-        # self.subcategories_list.Bind(wx.EVT_COMBOBOX, self.update_subcategories)
         main_sizer.Add(row_builder([categories_lbl, self.categories_list]))
 
         description_lbl = wx.StaticText(self, label="Description :")
@@ -125,7 +103,6 @@ class PostAdDialog(wx.Dialog):
         locations_lbl.SetFont(font)
         self.locations_list = wx.ComboBox(self, wx.ID_ANY, size=(400, -1), style=wx.CB_READONLY,
                                           choices=self.locs_to_strings(sub_locations))
-        # self.locations_list.SetSelection(0)
         if self.config['DEFAULT_AD']['LOCATION']:
             self.locations_list.SetSelection(self.locs_to_strings(sub_locations).index(self.config['DEFAULT_AD']['LOCATION']))
         else:
@@ -197,7 +174,7 @@ class PostAdDialog(wx.Dialog):
                     'types:zip-code': zip_code,
                 },
                 'ad:visible-on-map': 'true',  # appears to make no difference if set to 'true' or 'false'
-                'attr:attributes': None, # TEMP
+                'attr:attributes': None,
                 # 'attr:attributes': {'attr:attribute': [
                 #     {'@localized-label': 'For Sale By', '@type': 'ENUM', '@accessibility-feature': 'false',
                 #      '@name': 'forsaleby', 'attr:value': {'@localized-label': 'Owner', '#text': 'ownr'}},
@@ -217,12 +194,7 @@ class PostAdDialog(wx.Dialog):
             'types:currency-iso-code': {'types:value': 'CAD'},  # Assume Canadian dollars
         })
 
-        print(payload)
-        print("\n")
-
         xml_payload = xmltodict.unparse(payload, short_empty_elements=True)
-
-        print(xml_payload)
 
         # Submit final payload
         try:
@@ -283,7 +255,6 @@ class PostAdDialog(wx.Dialog):
             self.price.Enable()
 
         self.subcategories_list.Clear()
-        # print(self.main_cats_list.GetCurrentSelection())
         self.subcategories_list.SetItems(self.get_subcategories(self.main_cats_list.GetCurrentSelection()))
         self.subcategories_list.SetSelection(0)
 
@@ -291,7 +262,6 @@ class PostAdDialog(wx.Dialog):
 
     def update_categories(self, event):
         self.categories_list.Clear()
-        # print(self.main_cats_list.GetCurrentSelection())
         self.categories_list.SetItems(self.get_categories(self.main_cats_list.GetCurrentSelection(),
                                                           self.subcategories_list.GetCurrentSelection()))
         if self.categories_list.GetCount() < 1:
@@ -301,7 +271,6 @@ class PostAdDialog(wx.Dialog):
             self.categories_list.SetSelection(0)
 
     def get_categories(self, index, index2):
-        # print(self.cats['cat:categories']['cat:category']['cat:category'][index]['cat:category'][index2])
         if 'cat:category' in self.cats['cat:categories']['cat:category']['cat:category'][index]['cat:category'][index2]:
             categories = []
             for i in self.cats['cat:categories']['cat:category']['cat:category'][index]['cat:category'][index2][
@@ -313,11 +282,8 @@ class PostAdDialog(wx.Dialog):
 
     def get_subcategories(self, index):
         subcategories = []
-        # subcategories = [{}]
         for i in self.cats['cat:categories']['cat:category']['cat:category'][index]['cat:category']:
-            # subcategories.append({'id': i['@id'], 'name': i['cat:id-name']})
             subcategories.append(i['cat:id-name'])
-        # print(subcategories)
         return subcategories
 
     def get_main_locations(self) -> list:
@@ -335,9 +301,6 @@ class PostAdDialog(wx.Dialog):
                         for b in value2:
                             # if len(b) > 1:
                             list_of_strings.append(str(key) + ", " + key2 + ", " + b)
-                        # print(key2)
-                        # print(value2)
-                    # list_of_strings.append(str(key) + ", " + j[])
                 elif type(j) is str:
                     list_of_strings.append(str(key) + ", " + j)
 
@@ -349,7 +312,6 @@ class PostAdDialog(wx.Dialog):
         for i in states:
             locs[i] = []
         keys = list(locs)
-        # print(locs)
         for i in range(len(keys)):
             for index, j in enumerate(
                     self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:location']):
@@ -361,21 +323,8 @@ class PostAdDialog(wx.Dialog):
                         sub_locs[j['loc:localized-name']] = []
                         for index2, k in enumerate(j['loc:location']):
                             if type(k) is dict:
-                                # print(k['loc:localized-name']) # class str
                                 sub_locs[j['loc:localized-name']].append(k['loc:localized-name'])
-                            # else:
-                            #     print(k)  # TEMP
-                            #     print(self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:location'][index])  # TEMP
-                            #     sub_locs[j['loc:localized-name']].append(self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:location'][index]['loc:location']['loc:localized-name'])
-                            #     print(type(self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:location'][index]['loc:location']['loc:localized-name']))
-                            # print(sub_locs)
                         locs[keys[int(i)]].append(sub_locs)
-                        # sub_locs[j['loc:localized-name']].append(
-                        #     self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:location'][index][
-                        #         'loc:location']['loc:localized-name'])
-                        # print(self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:location'][index]['loc:location'])
-                        # print(sub_locs)
-            # locs[keys[int(i)]].append(self.locations['loc:locations']['loc:location']['loc:location'][i]['loc:localized-name']) # Баг, который повторяет штаты
 
         locs['Territories'][0]['Nunavut'] = ['Iqaluit']
         locs['Territories'][1]['Northwest Territories'] = ['Yellowknife']
