@@ -34,7 +34,7 @@ class Kijiji(Driver):
             data = dict()
             data['email'] = email
 
-            driver = self.setup_driver(proxy=proxy, undetected=True, twocaptcha_ext=False, headless=True)
+            driver = self.setup_driver(proxy=proxy, undetected=True, twocaptcha_ext=False, headless=False)
             if thread.want_abort:
                 driver.close()
                 driver.quit()

@@ -1,7 +1,8 @@
-from singletonmeta import SingletonMeta
+# from singletonmeta import SingletonMeta
 
 
-class Proxy(metaclass=SingletonMeta):
+# class Proxy(metaclass=SingletonMeta):
+class Proxy:
 
     def __init__(self, username, password, host, port, url):
         self.username = username

@@ -1,4 +1,5 @@
 import time
+from proxy import Proxy
 from ipchanger import IPChanger
 import gsheet
 from e_mail import Email
@@ -43,7 +44,10 @@ class RegisterThread(Thread):
                 wx.PostEvent(self._notify_window, ResultEvent(None))
                 return
             wx.CallAfter(pub.sendMessage, "update", msg="")
-            email_dict = email.register(self, self.proxy)
+            # email_dict = email.register(self, self.proxy)
+            email_dict = email.register(self, Proxy(self.config['PROXY_EMAIL']['USERNAME'], self.config['PROXY_EMAIL']['PASSWORD'],
+                                                    self.config['PROXY_EMAIL']['HOST'], self.config['PROXY_EMAIL']['PORT'],
+                                                    self.config['PROXY_EMAIL']['URL']))
             if not email_dict:
                 wx.PostEvent(self._notify_window, ResultEvent(None))
                 return
