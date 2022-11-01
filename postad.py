@@ -6,12 +6,9 @@ from helper import show_message
 from helper import row_builder
 from picture import Picture
 from randdesc import RandomDescription
-
-
 # from kijiji_api import KijijiApiException
 
 
-# Добавить фильтр только для png jpg...
 def get_random_photos(path, num=1):  # 2 - коли
     files = os.listdir(path)
     files = [f for f in files if os.path.isfile(path + '/' + f)]  # Filtering only the files.

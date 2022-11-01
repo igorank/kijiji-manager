@@ -11,8 +11,11 @@ def read(path, file):
 class RandomDescription:
 
     def __new__(cls, path):
-        files = os.listdir(path)
-        files = [f for f in files if os.path.isfile(path + '/' + f)]
+        files = []
+        for x in os.listdir(path):
+            if x.endswith(".txt"):
+                files.append(x)
+        print(files)
         file = choice(files)
         data = read(path, file)
         return data
