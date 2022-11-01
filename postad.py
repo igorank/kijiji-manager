@@ -6,7 +6,7 @@ from helper import show_message
 from helper import row_builder
 from picture import Picture
 from randdesc import RandomDescription
-# from kijiji_api import KijijiApiException
+from kijiji_api import KijijiApiException
 
 
 def get_random_photos(path, num=1):  # 2 - коли
@@ -149,7 +149,11 @@ class PostAdDialog(wx.Dialog):
                 photos_list.append(Picture(i, self.photo_folder.GetPath()))
 
         zip_code = self.zip_code.GetValue()
-        location = self.kijiji_api.geo_location(zip_code)
+        try:
+            location = self.kijiji_api.geo_location(zip_code)
+        except KijijiApiException as exception:
+            show_message(str(exception), 'Error')
+            return
 
         payload = {
             'ad:ad': {
