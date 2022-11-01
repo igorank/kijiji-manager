@@ -10,8 +10,10 @@ from randdesc import RandomDescription
 
 
 def get_random_photos(path, num=1):  # 2 - коли
-    files = os.listdir(path)
-    files = [f for f in files if os.path.isfile(path + '/' + f)]  # Filtering only the files.
+    files = []
+    for x in os.listdir(path):
+        if x.endswith(('.jpg', '.jpeg', '.png', '.PNG', '.gif', '.bmp')):
+            files.append(x)
     photo_names = choices(files, k=num)
     # photo_path = path + "\\" + photo_name
     return photo_names

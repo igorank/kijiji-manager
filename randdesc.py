@@ -15,7 +15,6 @@ class RandomDescription:
         for x in os.listdir(path):
             if x.endswith(".txt"):
                 files.append(x)
-        print(files)
         file = choice(files)
         data = read(path, file)
         return data
