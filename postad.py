@@ -141,11 +141,12 @@ class PostAdDialog(wx.Dialog):
 
     def post(self, event):
 
-        photos_name_list = get_random_photos(self.photo_folder.GetPath(), int(
-            self.config['DEFAULT_AD']['IMAGES_NUM']))  # второй аргумент - количество картинок
         photos_list = []
-        for i in photos_name_list:
-            photos_list.append(Picture(i, self.photo_folder.GetPath()))
+        if self.photo_folder.GetPath():
+            photos_name_list = get_random_photos(self.photo_folder.GetPath(), int(
+                self.config['DEFAULT_AD']['IMAGES_NUM']))  # второй аргумент - количество картинок
+            for i in photos_name_list:
+                photos_list.append(Picture(i, self.photo_folder.GetPath()))
 
         zip_code = self.zip_code.GetValue()
         location = self.kijiji_api.geo_location(zip_code)
