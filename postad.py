@@ -143,8 +143,12 @@ class PostAdDialog(wx.Dialog):
 
         photos_list = []
         if self.photo_folder.GetPath():
-            photos_name_list = get_random_photos(self.photo_folder.GetPath(), int(
-                self.config['DEFAULT_AD']['IMAGES_NUM']))  # второй аргумент - количество картинок
+            try:
+                photos_name_list = get_random_photos(self.photo_folder.GetPath(), int(
+                    self.config['DEFAULT_AD']['IMAGES_NUM']))  # второй аргумент - количество картинок
+            except FileNotFoundError as exception:
+                show_message(str(exception), 'Error')
+                return
             for i in photos_name_list:
                 photos_list.append(Picture(i, self.photo_folder.GetPath()))
 
