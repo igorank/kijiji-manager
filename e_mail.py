@@ -1,6 +1,8 @@
 import random
 import time
-import os
+
+import imap_tools.idle
+
 from driver import Driver
 from ipchanger import IPChanger
 from twocaptcha import TwoCaptcha
@@ -140,8 +142,6 @@ class Email(Driver):
             if thread.want_abort:
                 return False
             try:
-                if thread.want_abort:
-                    return False
                 self.settings_captcha_solver(driver)
                 if thread.want_abort:
                     return False
@@ -205,20 +205,21 @@ class Email(Driver):
                     if second_try:
                         img = driver.find_element(By.XPATH, '//img[@class="captcha__img img-responsive"]')
                     else:
-                        img = driver.find_element("xpath", "/html/body/div[5]/div/div/div[2]/div[2]/div[1]/img")
-                    img.screenshot('cache\\' + str(username) + '.png')
+                        img = driver.find_element(By.XPATH, '/html/body/div[5]/div/div/div[2]/div[2]/div[1]/img')
+                    # img.screenshot('cache\\' + str(username) + '.png')
                     try:
-                        result = solver.normal('cache\\' + str(username) + '.png')
+                        # result = solver.normal('cache\\' + str(username) + '.png')
+                        result = solver.normal(img.screenshot_as_base64)
                     except:
                         if thread.want_abort:
                             return False
-                        os.remove('cache\\' + str(username) + '.png')
+                        # os.remove('cache\\' + str(username) + '.png')
                         driver.close()
                         driver.quit()
                         IPChanger.change_ip(proxy.get_change_ip_url())
                         continue
 
-                    os.remove('cache\\' + str(username) + '.png')
+                    # os.remove('cache\\' + str(username) + '.png')
 
                     if second_try:
                         driver.find_element("xpath",
@@ -370,7 +371,7 @@ class Email(Driver):
                         continue
                     elif h_captcha_result == 2:
                         return False
-            except:
+            except Exception:
                 if thread.want_abort:
                     return False
                 if initialized:

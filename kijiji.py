@@ -4,9 +4,11 @@ from driver import Driver
 from ipchanger import IPChanger
 from filemanager import FileManager
 from randomuserpass import RandomGenerator
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 from imapreader import EmailReader
 
 
@@ -40,7 +42,10 @@ class Kijiji(Driver):
                 driver.quit()
                 return False
 
-            driver.get("https://www.kijiji.ca/t-user-registration.html")
+            try:
+                driver.get("https://www.kijiji.ca/t-user-registration.html")
+            except TimeoutException:
+                driver.find_element(By.TAG_NAME, "body").send_keys(Keys.ESCAPE)
             if thread.want_abort:
                 driver.close()
                 driver.quit()
@@ -89,20 +94,37 @@ class Kijiji(Driver):
                 return False
 
             try:
-                WebDriverWait(driver, 20).until(
+                WebDriverWait(driver, 15).until(
                     lambda driver: driver.find_elements(By.XPATH, '//*[@id="LocUpdate"]')
                     or driver.find_elements(By.XPATH, '//*[@id="Homepage"]/div[1]/span/div/button'))
                 break
             except:
-                if thread.want_abort:
+                try:
+                    driver.find_element(By.TAG_NAME, "body").send_keys(Keys.ESCAPE)
+                    WebDriverWait(driver, 5).until(
+                        lambda driver: driver.find_elements(By.XPATH, '//*[@id="LocUpdate"]')
+                                       or driver.find_elements(By.XPATH, '//*[@id="Homepage"]/div[1]/span/div/button'))
+                    break
+                except:
+                    if thread.want_abort:
+                        driver.close()
+                        driver.quit()
+                        return False
+
+                    IPChanger.change_ip(proxy.get_change_ip_url())
                     driver.close()
                     driver.quit()
-                    return False
+                    continue
 
-                IPChanger.change_ip(proxy.get_change_ip_url())
-                driver.close()
-                driver.quit()
-                continue
+                # if thread.want_abort:
+                #     driver.close()
+                #     driver.quit()
+                #     return False
+                #
+                # IPChanger.change_ip(proxy.get_change_ip_url())
+                # driver.close()
+                # driver.quit()
+                # continue
 
         if thread.want_abort:
             driver.close()
@@ -118,7 +140,10 @@ class Kijiji(Driver):
 
         cookies = get_cookies(driver)
         data['cookies'] = cookies
-        driver.get(verf_link)
+        try:
+            driver.get(verf_link)
+        except TimeoutException:
+            driver.find_element(By.TAG_NAME, "body").send_keys(Keys.ESCAPE)
         if thread.want_abort:
             driver.close()
             driver.quit()

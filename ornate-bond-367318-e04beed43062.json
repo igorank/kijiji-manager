@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "ornate-bond-367318",
+  "private_key_id": "e04beed4306292a5f7fdb2da730749d582e53a34",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCil/j//GwK3Thc\nRvOCeY6jJCX6LqnVnMk9aElnvv+Bbiw+9DzLHcoz0bOk8H/qRjEo/Nn0cLv42y7w\n9usR5pk77/FuxaqpBIWcnVNLIbOcy/WhtoIkNyU7XH+O3v5B1GBCkUPey8L4VY+o\naKAGRWZ7rCMbMCF7F+tkOQTQYzPg/Or1Q+ggiNVb78ckidyrfCjYxilHEaJEI2Oe\nU7zRqeKfySrOMmEMO7BQ9G8sq9iSH0b1LbXtYegQ3adkQJv4rYxp1vS4e+U+PJQw\nYw9J10GSrHXbZWmjjK0RLmpTX7ed1LvLM1NrK33Aty0z9M8LsUeq+ymbViJkXi7G\nbn2krvv9AgMBAAECggEAEQBHCa1BNtmZfRHw1bcUJ7wt5Ge2BnSrGNVWEkJca7ze\nD4Rw9Dlx3Sfo2tmdkRzfIw6yqOaTdm/6C+QlrEIqdPlKi29LwE84EVTkqA8mvWxu\nNgc5ZcQGYUXzaI2p6a7lPyX6rMnYNyiV1DbXFLtzqIF/95B5emouiNTqy0de3gAp\nfTYDXqrxt+inR8XseyfxShKaUlnXjij+rNIXIcayZujJZ7AZfRSJO8Z/8WHDBptE\nVt0Z5hPHLpL9G1cqIDJJzJIrtZ+rnPArX39OwzO+PrCp5ywHAqOdhrzS2xMlxpGK\n5oJx0pB6sD1M9MHP8cE6eYV6Wwhwivyv/Lz5mfJ8mQKBgQDPfbW2MS4jrqn8Kvg4\nKUiPuESUjKnnTB9S07Xc9i/i3rbDU8mnuCAOFkYUu9wPJ5AdKm1+cwiqTEK8/0BP\nd4DPLWVrDYKicGodeAnOzvgR4nO+lizjeWjHdjF+2oPhiM3OG4cqHvDsIBLZrSgE\nqObPNQkHxeHzlJeMS+DOoXFs3wKBgQDImyna/ZaZ9c6zrDGGLwCmhn8s40sXyktc\n29KM8/1XlZ4o/5IMJNZJO0OLrryk91yriv1a8toNsBoRe7q72r48OGKVjigcc8Xz\nIj6rGtGVdaK3BwkF7ZKLVgM2CrphvGPk8UwQmp5xBlR8S0w6mYnVR3Me2dt0l6TA\nj4mWJdSWowKBgQDLapjMxyZOwRvRJmc21/JVQ/eoEsc3BP/oebnfqFOF/YX7tJcM\nIIz8goWuKgYxrT2x+jhiMXCbVCxRkYSA482aTw0QiKw7iC3gOiCTaYD2N6X1gND9\nKbe5ZHxduuh0IWRy3bYDa1YSh9czJHkJKHUvSvVRc4RzAogYeQMqUEgczQKBgDbU\nul8B+zz/w8y2Xx73D+10S6SAR9Er2Od7qhQeyHs9COrZ2Bh7pRqFGVQ/oY5RkkHN\nDqziPhmJrcZjlEmuY1rgaonIPkxwlIV9MbXg8bIxYhU21g+JvQlarCwESKdYL9Gu\n5oSPTolEGqmShzZpKxRhoCSplWNL45tCYG/qzS2TAoGAa5oFtOdXMxGDzP9ETHjg\nmQWZHStJupdt262+m2HzqSxpxT1A37vC588UM5/6qrNu9YLSSKqoiV1QbEHDge6d\nXrL5WmWFKYeoj9Rt8hlAjk+TQgYYPqz3QO2LdxguDyiDQ9wWUU5lbDJp1TUNjT7W\nLCtpRjwP/aQ1HUTyvGO05io=\n-----END PRIVATE KEY-----\n",
+  "client_email": "igor-922@ornate-bond-367318.iam.gserviceaccount.com",
+  "client_id": "103619128344181850664",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/igor-922%40ornate-bond-367318.iam.gserviceaccount.com"
+}

@@ -13,7 +13,7 @@ class RegisterDialog(wx.Dialog):
     def __init__(self, config, proxy, main_sheet, title="Register"):
         """Constructor"""
         style = wx.DEFAULT_FRAME_STYLE & (~wx.CLOSE_BOX) & (~wx.MAXIMIZE_BOX) & (~wx.RESIZE_BORDER) & (~wx.MINIMIZE_BOX)
-        super().__init__(None, title="%s Accounts" % title, style=style)
+        super().__init__(None, title="%s Profiles" % title, style=style)
         self.proxy = proxy
         self.Centre()
 
