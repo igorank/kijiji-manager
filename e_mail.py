@@ -1,8 +1,5 @@
 import random
 import time
-
-import imap_tools.idle
-
 from driver import Driver
 from ipchanger import IPChanger
 from twocaptcha import TwoCaptcha
