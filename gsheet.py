@@ -1,6 +1,6 @@
 import gspread
-from singletonmeta import SingletonMeta
 from oauth2client.service_account import ServiceAccountCredentials
+from singletonmeta import SingletonMeta
 
 
 def get_gs_client(key, keyfile_name):

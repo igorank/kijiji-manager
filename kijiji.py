@@ -1,18 +1,15 @@
 import random
 import string
-from driver import Driver
-from ipchanger import IPChanger
-from filemanager import FileManager
-from randomuserpass import RandomGenerator
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from driver import Driver
+from ipchanger import IPChanger
+from filemanager import FileManager
+from randomuserpass import RandomGenerator
 from imapreader import EmailReader
-#TEMP
-import os
-import sys
 
 
 def random_upper_letter():
@@ -39,7 +36,7 @@ class Kijiji(Driver):
             data = dict()
             data['email'] = email
 
-            driver = self.setup_driver(proxy=proxy, undetected=True, twocaptcha_ext=False, headless=False)
+            driver = self.setup_driver(proxy=proxy, undetected=True, twocaptcha_ext=False, headless=True)
             if thread.want_abort:
                 driver.close()
                 driver.quit()

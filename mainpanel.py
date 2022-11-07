@@ -1,14 +1,14 @@
-import wx
-import helper
 import configparser
+import wx
+from ObjectListView import ObjectListView, ColumnDefn
+import helper
 from proxy import Proxy
 from viewprofile import ViewDialog
 from registerdialog import RegisterDialog
-from ObjectListView import ObjectListView, ColumnDefn
 from gsheet import GSheet
 
 
-class Account(object):
+class Account:
 
     def __init__(self, user_id, email, kijiji_pass, email_pass, imap_pass, forwarding, token):
         self.user_id = user_id

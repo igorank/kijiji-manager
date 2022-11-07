@@ -1,7 +1,7 @@
-import wx
 import os
-import xmltodict
 from random import choices
+import wx
+import xmltodict
 from helper import show_message
 from helper import row_builder
 from image import Image

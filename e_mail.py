@@ -1,22 +1,19 @@
 import random
 import time
-from driver import Driver
-from ipchanger import IPChanger
-from twocaptcha import TwoCaptcha
-from tempmail import GuerrillaMail
-from filemanager import FileManager
-from imapreader import EmailReader
-from randomuserpass import RandomGenerator
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
-from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException,\
+from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException, \
     TimeoutException
+from twocaptcha import TwoCaptcha
 from twocaptcha.api import ApiException
-#TEMP
-import os
-import sys
+from driver import Driver
+from ipchanger import IPChanger
+from tempmail import GuerrillaMail
+from filemanager import FileManager
+from imapreader import EmailReader
+from randomuserpass import RandomGenerator
 
 
 class Email(Driver):
@@ -43,15 +40,18 @@ class Email(Driver):
             driver.switch_to.window(driver.window_handles[-1])
         driver.get("chrome-extension://ifibfemgeogfhoebkmokieepdoobkbpo/options/options.html")
         WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "/html/body/div/div[1]/table/tbody/tr[1]/td[2]/input")))
-        driver.find_element("xpath", "/html/body/div/div[1]/table/tbody/tr[1]/td[2]/input").send_keys(
-            self.twocaptcha_api_key)
+            EC.presence_of_element_located((By.XPATH,
+                                            "/html/body/div/div[1]/table/tbody/tr[1]/td[2]/input")))
+        driver.find_element("xpath", "/html/body/div/div[1]/table/tbody/tr[1]/td[2]/input"). \
+            send_keys(self.twocaptcha_api_key)
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located(
                 (By.XPATH, "/html/body/div/form/div[2]/table/tbody/tr[5]/td[2]/div[2]/input")))
-        driver.find_element("xpath", "/html/body/div/form/div[2]/table/tbody/tr[5]/td[2]/div[2]/input").click()
+        driver.find_element("xpath",
+                            "/html/body/div/form/div[2]/table/tbody/tr[5]/td[2]/div[2]/input").click()
         WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "/html/body/div/div[1]/table/tbody/tr[1]/td[3]/button")))
+            EC.presence_of_element_located((By.XPATH,
+                                            "/html/body/div/div[1]/table/tbody/tr[1]/td[3]/button")))
         driver.find_element("xpath", "/html/body/div/div[1]/table/tbody/tr[1]/td[3]/button").click()
         self.press_ok(driver)
 
@@ -181,19 +181,19 @@ class Email(Driver):
                 driver.find_element("xpath",
                                     "/html/body/div[1]/article/div/div/div[2]/form/fieldset/div[3]/div[1]/div["
                                     "1]/label/input").click()
-                r = self.terms_agree(driver, thread)
-                if not r:
+                response = self.terms_agree(driver, thread)
+                if not response:
                     driver.close()
                     driver.quit()
                     IPChanger.change_ip(proxy.get_change_ip_url())
                     continue
-                elif r == 2:
+                if response == 2:
                     return False
                 driver.find_element("xpath",
                                     "/html/body/div[1]/article/div/div/div[2]/form/fieldset/div[3]/div[1]/div["
                                     "2]/label/input").click()
                 driver.find_element("xpath",
-                                    "/html/body/div[1]/article/div/div/div[2]/form/fieldset/div[3]/div[2]/button")\
+                                    "/html/body/div[1]/article/div/div/div[2]/form/fieldset/div[3]/div[2]/button") \
                     .click()
                 WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located(
@@ -333,7 +333,7 @@ class Email(Driver):
                             driver.quit()
                             IPChanger.change_ip(proxy.get_change_ip_url())
                             continue
-                        elif imap_pass == 1:
+                        if imap_pass == 1:
                             return False
                         driver.find_element("xpath", '//*[@id="pop3-pass-modal-submit"]').click()  # OK Button
                         if thread.want_abort:
@@ -357,21 +357,22 @@ class Email(Driver):
                         if thread.want_abort:
                             return False
                         data = {'email': username + "@inbox.lv", 'email_pass': str(password),
-                                'imap_pass': str(imap_pass), 'useragent': self.get_useragent(), 'forwarding_email': forw_email}
+                                'imap_pass': str(imap_pass), 'useragent': self.get_useragent(),
+                                'forwarding_email': forw_email}
                         return data
-                    elif h_captcha_result == -1:
+                    if h_captcha_result == -1:
                         driver.close()
                         driver.quit()
                         IPChanger.change_ip(proxy.get_change_ip_url())
                         break
-                    elif h_captcha_result == 0:
+                    if h_captcha_result == 0:
                         second_try = True
                         driver.find_element(By.XPATH, '//button[@class="btn btn-default"]').click()  # Отмена
                         WebDriverWait(driver, 10).until(EC.element_to_be_clickable(
                             (By.XPATH, '//*[@id="signup_submit"]')))
                         driver.find_element(By.XPATH, '//*[@id="signup_submit"]').click()
                         continue
-                    elif h_captcha_result == 2:
+                    if h_captcha_result == 2:
                         return False
             except (ElementClickInterceptedException, TimeoutException):
                 if thread.want_abort:
@@ -398,24 +399,23 @@ def check_hcaptcha(driver, thread) -> int:
             try:
                 if "ERROR_SITEKEY" in driver.page_source:
                     return 0
-            except Exception as e:
+            except Exception:
                 pass
             try:
                 if "Слишком много попыток регистрации. Попробуйте позже." in driver.page_source:
                     return -1
-            except Exception as e:
+            except Exception:
                 pass
             try:
                 if "API_HTTP_CODE_500" in driver.page_source or "API_HTTP_CODE_521" in driver.page_source:
                     return -1
-            except Exception as e:
+            except Exception:
                 pass
             try:
                 if "Ошибка создания новой учётной записи. Попробуйте повторить через 5 минут." in driver.page_source:
                     return -1
-            except Exception as e:
+            except Exception:
                 pass
-            pass
         time.sleep(2)
         it += 1
     return -1

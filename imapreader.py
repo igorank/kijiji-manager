@@ -2,11 +2,11 @@ import time
 from imap_tools import MailBox
 
 
-def unescape(s):
-    s = s.replace("&lt;", "<")
-    s = s.replace("&gt;", ">")
-    s = s.replace("&amp;", "&")
-    return s
+def unescape(string):
+    string = string.replace("&lt;", "<")
+    string = string.replace("&gt;", ">")
+    string = string.replace("&amp;", "&")
+    return string
 
 
 class EmailReader:
@@ -43,7 +43,8 @@ class EmailReader:
                 if msg.from_ == "support@inbox.lv":
                     text = str(msg.html)
                     index = text.find(
-                        'color:white;outline: none;display:inline-block;line-height:50px;margin-bottom:15px;margin-top:15px;">')
+                        'color:white;outline: none;display:inline-block;line-height:50px;margin-bottom:15px;margin'
+                        '-top:15px;">')
                     start = text[index:]
                     code_str = start.partition('</span>')[0]
                     code = code_str[-6:]

@@ -5,9 +5,6 @@ from registerthread import RegisterThread
 from wx.lib.pubsub import pub
 
 
-# from ipchanger import IPChanger
-
-
 class RegisterDialog(wx.Dialog):
 
     def __init__(self, config, proxy, main_sheet, title="Register"):
@@ -87,12 +84,13 @@ class RegisterDialog(wx.Dialog):
             self.main_sizer.Add(self.status, 0, wx.CENTER, 5)
 
             # Запускаем поток регистрации
-            self.worker = RegisterThread(self, self.config, self.num_profiles, self.proxy, self.main_sheet)
             try:  # Перехват исключения не работает
+                self.worker = RegisterThread(self, self.config, self.num_profiles, self.proxy, self.main_sheet)
                 self.worker.start()
-            except Exception as e:
-                show_message(str(e), 'Error')
+            except ValueError as exception:
+                show_message(str(exception), 'Error')
                 self.Destroy()
+                return
 
             self.progress.Show()
             self.progress.SetRange((int(self.num_profiles)) * 100)

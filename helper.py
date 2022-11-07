@@ -20,4 +20,3 @@ def row_builder(widgets, lbl_border=5):
     sizer.Add(lbl, 0, wx.ALL, lbl_border)
     sizer.Add(txt, 1, wx.ALL, 5)
     return sizer
-
