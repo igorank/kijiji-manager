@@ -11,6 +11,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
+from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException,\
+    TimeoutException
+from twocaptcha.api import ApiException
+#TEMP
+import os
+import sys
 
 
 class Email(Driver):
@@ -68,7 +74,7 @@ class Email(Driver):
             try:
                 driver.find_element("xpath", "/html/body/div[5]/div/div/div[3]/button[2]").click()
                 return True
-            except:
+            except NoSuchElementException:
                 time.sleep(1)
                 it += 1
                 continue
@@ -207,7 +213,7 @@ class Email(Driver):
                     try:
                         # result = solver.normal('cache\\' + str(username) + '.png')
                         result = solver.normal(img.screenshot_as_base64)
-                    except:
+                    except ApiException:
                         if thread.want_abort:
                             return False
                         # os.remove('cache\\' + str(username) + '.png')
@@ -234,7 +240,7 @@ class Email(Driver):
                                 (By.XPATH, "/html/body/div[5]/div/div/div[2]/div[2]/div[1]/img")))
                         if thread.want_abort:
                             return False
-                    except:
+                    except TimeoutException:
                         if thread.want_abort:
                             return False
                         solver.report(result['captchaId'], False)
@@ -367,7 +373,7 @@ class Email(Driver):
                         continue
                     elif h_captcha_result == 2:
                         return False
-            except Exception:
+            except (ElementClickInterceptedException, TimeoutException):
                 if thread.want_abort:
                     return False
                 if initialized:
@@ -388,26 +394,26 @@ def check_hcaptcha(driver, thread) -> int:
             if driver.find_element("xpath",
                                    "/html/body/div[1]/div[2]/div/div/div[2]/div/div"):
                 return 1
-        except:
+        except NoSuchElementException:
             try:
                 if "ERROR_SITEKEY" in driver.page_source:
                     return 0
-            except:
+            except Exception as e:
                 pass
             try:
                 if "Слишком много попыток регистрации. Попробуйте позже." in driver.page_source:
                     return -1
-            except:
+            except Exception as e:
                 pass
             try:
                 if "API_HTTP_CODE_500" in driver.page_source or "API_HTTP_CODE_521" in driver.page_source:
                     return -1
-            except:
+            except Exception as e:
                 pass
             try:
                 if "Ошибка создания новой учётной записи. Попробуйте повторить через 5 минут." in driver.page_source:
                     return -1
-            except:
+            except Exception as e:
                 pass
             pass
         time.sleep(2)

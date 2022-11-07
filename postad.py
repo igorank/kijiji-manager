@@ -4,7 +4,7 @@ import xmltodict
 from random import choices
 from helper import show_message
 from helper import row_builder
-from picture import Picture
+from image import Image
 from randdesc import RandomDescription
 from kijiji_api import KijijiApiException
 
@@ -150,7 +150,7 @@ class PostAdDialog(wx.Dialog):
                 show_message(str(exception), 'Error')
                 return
             for i in photos_name_list:
-                photos_list.append(Picture(i, self.photo_folder.GetPath()))
+                photos_list.append(Image(i, self.photo_folder.GetPath()))
 
         zip_code = self.zip_code.GetValue()
         try:

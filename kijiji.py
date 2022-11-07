@@ -10,6 +10,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from imapreader import EmailReader
+#TEMP
+import os
+import sys
 
 
 def random_upper_letter():
@@ -36,7 +39,7 @@ class Kijiji(Driver):
             data = dict()
             data['email'] = email
 
-            driver = self.setup_driver(proxy=proxy, undetected=True, twocaptcha_ext=False, headless=True)
+            driver = self.setup_driver(proxy=proxy, undetected=True, twocaptcha_ext=False, headless=False)
             if thread.want_abort:
                 driver.close()
                 driver.quit()
@@ -66,7 +69,7 @@ class Kijiji(Driver):
                         EC.element_to_be_clickable(
                             (By.XPATH, '//*[@id="mainPageContent"]/div/div/div/div/div/div/main/form/button')))
                     break
-                except:
+                except TimeoutException:
                     driver.refresh()
 
             name = random.choice(self.names)
@@ -98,14 +101,14 @@ class Kijiji(Driver):
                     lambda driver: driver.find_elements(By.XPATH, '//*[@id="LocUpdate"]')
                     or driver.find_elements(By.XPATH, '//*[@id="Homepage"]/div[1]/span/div/button'))
                 break
-            except:
+            except TimeoutException:
                 try:
                     driver.find_element(By.TAG_NAME, "body").send_keys(Keys.ESCAPE)
                     WebDriverWait(driver, 5).until(
                         lambda driver: driver.find_elements(By.XPATH, '//*[@id="LocUpdate"]')
                                        or driver.find_elements(By.XPATH, '//*[@id="Homepage"]/div[1]/span/div/button'))
                     break
-                except:
+                except TimeoutException:
                     if thread.want_abort:
                         driver.close()
                         driver.quit()

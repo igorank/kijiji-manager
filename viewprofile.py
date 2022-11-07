@@ -28,11 +28,9 @@ def date_converter(string):
 
 class ViewDialog(wx.Dialog):
 
-    # def __init__(self, selected_row, title="Profile"):
     def __init__(self, selected_row, config, proxy):
         """Constructor"""
         super().__init__(None, title="%s's profile" % selected_row.email, size=wx.Size(640, 480))
-        # super().__init__(None, title=title)
         self.config = config
         self.user_id = selected_row.user_id
         self.email = selected_row.email

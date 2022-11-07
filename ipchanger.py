@@ -8,7 +8,7 @@ class IPChanger:
         if len(url) != 0:
             try:
                 requests.get(url, timeout=12)
-            except:
+            except requests.exceptions.ReadTimeout:
                 pass
         else:
             return

@@ -7,8 +7,8 @@ import seleniumwire.undetected_chromedriver.v2 as uc
 class UserAgent:
 
     def __new__(cls, filename):
-        with open(filename, encoding='utf-8') as f:
-            lines = f.read().splitlines()
+        with open(filename, encoding='utf-8') as file:
+            lines = file.read().splitlines()
         return lines
 
 
@@ -17,7 +17,7 @@ class Driver:
     def __init__(self, chrome_p) -> None:
         super().__init__()
         self.chromedriver_path = chrome_p
-        self.headless = True
+        self.headless = False
         self.useragents = UserAgent("useragents\\useragents_win.txt")
         self.useragent = None
 
@@ -43,18 +43,19 @@ class Driver:
         if proxy is not None:
             options = {
                 'proxy': {
-                    'http': 'socks5://' + proxy.get_username() + ':' + proxy.get_password() + '@' + proxy.get_host()
-                            + ':' + str(proxy.get_port()),
-                    'https': 'socks5://' + proxy.get_username() + ':' + proxy.get_password() + '@' + proxy.get_host()
-                             + ':' + str(proxy.get_port()),
+                    'http': 'socks5://' + proxy.get_username() + ':' + proxy.get_password()
+                            + '@' + proxy.get_host() + ':' + str(proxy.get_port()),
+                    'https': 'socks5://' + proxy.get_username() + ':' + proxy.get_password()
+                             + '@' + proxy.get_host() + ':' + str(proxy.get_port()),
                     'no_proxy': 'localhost,127.0.0.1'
                 }
             }
             if undetected:
-                driver = uc.Chrome(options=chrome_options, seleniumwire_options=options, service_args=args,
-                                   use_subprocess=True)
+                driver = uc.Chrome(options=chrome_options, seleniumwire_options=options,
+                                   service_args=args, use_subprocess=True)
             else:
-                driver = webdriver.Chrome(options=chrome_options, seleniumwire_options=options, service_args=args)
+                driver = webdriver.Chrome(options=chrome_options, seleniumwire_options=options,
+                                          service_args=args)
         else:
             if undetected:
                 driver = uc.Chrome(options=chrome_options, service_args=args, use_subprocess=True)

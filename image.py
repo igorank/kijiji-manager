@@ -1,4 +1,6 @@
-class Picture:
+class Image:
+    """Image data type
+    """
 
     def __init__(self, filename, path):
         self.filename = filename
@@ -6,5 +8,5 @@ class Picture:
         self.content_type = f'image/{filename[-3:]}'
 
     def read(self):
-        with open(self.photo_path, "rb") as f:
-            return f.read()
+        with open(self.photo_path, "rb") as file:
+            return file.read()
