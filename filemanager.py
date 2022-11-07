@@ -9,27 +9,3 @@ class FileManager:
             with open(filename, encoding='utf-8') as f:
                 lines = f.read().splitlines()
         return lines
-
-    @staticmethod
-    def remove_line_by_index(filename, linetoskip):
-        with open(filename, 'r') as read_file:
-            lines = read_file.readlines()
-
-        current_line = 1
-        with open(filename, 'w') as write_file:
-            for line in lines:
-                if current_line == linetoskip:
-                    pass
-                else:
-                    write_file.write(line)
-                current_line += 1
-
-    @staticmethod
-    def remove_line_by_text(filename, text):
-        with open(filename, 'r') as fr:
-            lines = fr.readlines()
-
-        with open(filename, 'w') as fw:
-            for line in lines:
-                if line.find(text) == -1:
-                    fw.write(line)

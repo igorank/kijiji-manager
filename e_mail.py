@@ -348,11 +348,10 @@ class Email(Driver):
                         self.successful_registrations += 1
                         driver.close()
                         driver.quit()
-                        useragent = self.get_useragent()
                         if thread.want_abort:
                             return False
                         data = {'email': username + "@inbox.lv", 'email_pass': str(password),
-                                'imap_pass': str(imap_pass), 'useragent': useragent, 'forwarding_email': forw_email}
+                                'imap_pass': str(imap_pass), 'useragent': self.get_useragent(), 'forwarding_email': forw_email}
                         return data
                     elif h_captcha_result == -1:
                         driver.close()

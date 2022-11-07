@@ -2,7 +2,14 @@ import random
 from seleniumwire import webdriver
 from selenium.webdriver.chrome.options import Options
 import seleniumwire.undetected_chromedriver.v2 as uc
-from useragent import UserAgent
+
+
+class UserAgent:
+
+    def __new__(cls, filename):
+        with open(filename, encoding='utf-8') as f:
+            lines = f.read().splitlines()
+        return lines
 
 
 class Driver:

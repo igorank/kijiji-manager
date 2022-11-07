@@ -12,10 +12,3 @@ class IPChanger:
                 pass
         else:
             return
-
-    @staticmethod
-    def get_ip(username, password, host, port):
-        ip = requests.get('https://api.ipify.org', proxies=dict(
-            http='socks5://' + str(username) + ':' + str(password) + '@' + str(host) + ':' + str(port),
-            https='socks5://' + str(username) + ':' + str(password) + '@' + str(host) + ':' + str(port))).text
-        return ip

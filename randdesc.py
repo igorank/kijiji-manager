@@ -13,7 +13,7 @@ class RandomDescription:
     def __new__(cls, path):
         files = []
         for x in os.listdir(path):
-            if x.endswith(".txt"):
+            if x.endswith(('.txt', '.TXT')):
                 files.append(x)
         file = choice(files)
         data = read(path, file)

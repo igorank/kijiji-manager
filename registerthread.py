@@ -52,7 +52,7 @@ class RegisterThread(Thread):
                 wx.PostEvent(self._notify_window, ResultEvent(None))
                 return
             wx.CallAfter(pub.sendMessage, "update", msg="")
-            del email
+            # del email
             wx.CallAfter(pub.sendMessage, "update", msg="")
             wx.CallAfter(pub.sendMessage, "update", msg="")
 
