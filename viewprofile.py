@@ -132,35 +132,20 @@ class ViewDialog(wx.Dialog):
         if 'ad:ad' in ads['ad:ads']:
             if type(ads['ad:ads']['ad:ad']) is list:
                 for i in ads['ad:ads']['ad:ad']:
-                    try:
-                        data.append(AD(i['@id'], i['ad:title'],
-                                       i['cat:category']['cat:id-name'],
-                                       i['ad:price']['types:amount'],
-                                       i['ad:view-ad-count'],
-                                       date_converter(i['ad:start-date-time']),
-                                       date_converter(i['ad:end-date-time'])))
-                    except KeyError:
-                        data.append(AD(i['@id'], i['ad:title'],
-                                       i['cat:category']['cat:id-name'],
-                                       " ",
-                                       i['ad:view-ad-count'],
-                                       date_converter(i['ad:start-date-time']),
-                                       date_converter(i['ad:end-date-time'])))
+                    data.append(AD(i['@id'], i['ad:title'],
+                                   i['cat:category']['cat:id-name'],
+                                   i['ad:price']['types:amount'] if 'ad:price' in i else " ",
+                                   i['ad:view-ad-count'],
+                                   date_converter(i['ad:start-date-time']),
+                                   date_converter(i['ad:end-date-time'])))
             elif type(ads['ad:ads']['ad:ad']) is dict:  # Если одна реклама
-                try:
-                    data.append(AD(ads['ad:ads']['ad:ad']['@id'], ads['ad:ads']['ad:ad']['ad:title'],
-                                   ads['ad:ads']['ad:ad']['cat:category']['cat:id-name'],
-                                   ads['ad:ads']['ad:ad']['ad:price']['types:amount'],
-                                   ads['ad:ads']['ad:ad']['ad:view-ad-count'],
-                                   date_converter(ads['ad:ads']['ad:ad']['ad:start-date-time']),
-                                   date_converter(ads['ad:ads']['ad:ad']['ad:end-date-time'])))
-                except KeyError:
-                    data.append(AD(ads['ad:ads']['ad:ad']['@id'], ads['ad:ads']['ad:ad']['ad:title'],
-                                   ads['ad:ads']['ad:ad']['cat:category']['cat:id-name'],
-                                   " ",
-                                   ads['ad:ads']['ad:ad']['ad:view-ad-count'],
-                                   date_converter(ads['ad:ads']['ad:ad']['ad:start-date-time']),
-                                   date_converter(ads['ad:ads']['ad:ad']['ad:end-date-time'])))
+                data.append(AD(ads['ad:ads']['ad:ad']['@id'], ads['ad:ads']['ad:ad']['ad:title'],
+                               ads['ad:ads']['ad:ad']['cat:category']['cat:id-name'],
+                               ads['ad:ads']['ad:ad']['ad:price']['types:amount'] if 'ad:price' in
+                               ads['ad:ads']['ad:ad'] else " ",
+                               ads['ad:ads']['ad:ad']['ad:view-ad-count'],
+                               date_converter(ads['ad:ads']['ad:ad']['ad:start-date-time']),
+                               date_converter(ads['ad:ads']['ad:ad']['ad:end-date-time'])))
         self.dataOlv.SetObjects(data)
 
     def set_data(self):
