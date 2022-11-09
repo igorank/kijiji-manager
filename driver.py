@@ -27,6 +27,7 @@ class Driver:
     def setup_driver(self, proxy=None, headless=True, undetected=False, twocaptcha_ext=True):
         if undetected:
             chrome_options = uc.ChromeOptions()
+            # chrome_options.page_load_strategy = 'none'  #TEST
         else:
             chrome_options = Options()
             if twocaptcha_ext:

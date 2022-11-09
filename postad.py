@@ -7,6 +7,7 @@ from helper import row_builder
 from image import Image
 from randdesc import RandomDescription
 from kijiji_api import KijijiApiException
+from httpcore import ReadTimeout
 
 
 def get_random_photos(path, num=1):  # 2 - коли
@@ -198,6 +199,7 @@ class PostAdDialog(wx.Dialog):
                 #     {'@localized-label': 'Condition', '@type': 'ENUM', '@accessibility-feature': 'false',
                 #      '@name': 'condition',
                 #      'attr:value': {'@localized-label': 'Used - Like new', '#text': 'usedlikenew'}}]},
+
                 'pic:pictures': self.create_picture_payload(photos_list),
                 'vid:videos': None,
                 'ad:adSlots': None,
@@ -366,7 +368,11 @@ class PostAdDialog(wx.Dialog):
         }
 
         for value in data:
-            link = self.kijiji_api.upload_image(self.user_id, self.user_token, value)
+            try:
+                link = self.kijiji_api.upload_image(self.user_id, self.user_token, value)
+            except ReadTimeout as read_timeout:
+                show_message(str(read_timeout) + "try again later.", 'Error')
+                return
 
             # Add a separate link for each image size
             links = []

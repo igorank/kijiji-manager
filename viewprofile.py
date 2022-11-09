@@ -1,12 +1,12 @@
 import wx
-from helper import show_message
-from kijiji_api import KijijiApi
-from helper import row_builder
-from postad import PostAdDialog
 from ObjectListView import ObjectListView, ColumnDefn
+from helper import show_message
+from helper import row_builder
+from kijiji_api import KijijiApi
+from postad import PostAdDialog
 
 
-class AD(object):
+class AD:
 
     def __init__(self, ad_id, title, category, price, views, start_date, end_date):
         self.ad_id = ad_id
@@ -55,8 +55,8 @@ class ViewDialog(wx.Dialog):
         self.registration_date = wx.StaticText(self, label=self.profile_info['user:user-profile'][
                                                                'user:user-registration-date'][:10])
         self.registration_date.SetFont(font_2)
-        t_var = profileid_lbl.GetSize()[0] + self.profileid.GetSize()[0] + registration_date_lbl.GetSize()[0] + \
-                self.registration_date.GetSize()[0]
+        t_var = profileid_lbl.GetSize()[0] + self.profileid.GetSize()[0] \
+                + registration_date_lbl.GetSize()[0] + self.registration_date.GetSize()[0]
         spacer = self.GetSize()[0] - t_var
         profileid_sizer.AddSpacer(spacer - int(t_var / 5))  # 60 отступы
         profileid_sizer.Add(registration_date_lbl, 0, wx.ALL, 5)
@@ -89,8 +89,6 @@ class ViewDialog(wx.Dialog):
         self.dataOlv = ObjectListView(self, wx.ID_ANY, sortable=False, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
         self.dataOlv.SetEmptyListMsg("No Ads")
 
-        # if int(self.profile_info['user:user-profile']['user:user-active-ad-count']) > 0:
-        #     self.ads = self.k_api.get_ad(self.user_id, self.token)
         self.update_spreadsheet()
         self.set_data()
 
@@ -123,7 +121,8 @@ class ViewDialog(wx.Dialog):
         self.update_spreadsheet()
 
     def on_post(self, event):
-        with PostAdDialog(self.k_api, self.user_id, self.email, self.token, self.config, self.update_spreadsheet) as dlg:
+        with PostAdDialog(self.k_api, self.user_id, self.email, self.token, self.config,
+                          self.update_spreadsheet) as dlg:
             dlg.ShowModal()
 
     def update_spreadsheet(self):

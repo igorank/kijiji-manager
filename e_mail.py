@@ -209,20 +209,16 @@ class Email(Driver):
                         img = driver.find_element(By.XPATH, '//img[@class="captcha__img img-responsive"]')
                     else:
                         img = driver.find_element(By.XPATH, '/html/body/div[5]/div/div/div[2]/div[2]/div[1]/img')
-                    # img.screenshot('cache\\' + str(username) + '.png')
                     try:
-                        # result = solver.normal('cache\\' + str(username) + '.png')
                         result = solver.normal(img.screenshot_as_base64)
                     except ApiException:
                         if thread.want_abort:
                             return False
-                        # os.remove('cache\\' + str(username) + '.png')
                         driver.close()
                         driver.quit()
                         IPChanger.change_ip(proxy.get_change_ip_url())
                         continue
 
-                    # os.remove('cache\\' + str(username) + '.png')
 
                     if second_try:
                         driver.find_element("xpath",
@@ -385,6 +381,10 @@ class Email(Driver):
 
 
 def check_hcaptcha(driver, thread) -> int:
+    errors = ["Слишком много попыток регистрации. Попробуйте позже.", "API_HTTP_CODE_500",
+               "API_HTTP_CODE_521",
+              "Ошибка создания новой учётной записи. Попробуйте повторить через 5 минут."]
+
     it = 0
     while it < 90:
 
@@ -396,26 +396,12 @@ def check_hcaptcha(driver, thread) -> int:
                                    "/html/body/div[1]/div[2]/div/div/div[2]/div/div"):
                 return 1
         except NoSuchElementException:
-            try:
-                if "ERROR_SITEKEY" in driver.page_source:
-                    return 0
-            except Exception:
-                pass
-            try:
-                if "Слишком много попыток регистрации. Попробуйте позже." in driver.page_source:
-                    return -1
-            except Exception:
-                pass
-            try:
-                if "API_HTTP_CODE_500" in driver.page_source or "API_HTTP_CODE_521" in driver.page_source:
-                    return -1
-            except Exception:
-                pass
-            try:
-                if "Ошибка создания новой учётной записи. Попробуйте повторить через 5 минут." in driver.page_source:
-                    return -1
-            except Exception:
-                pass
+            res = any(ele in driver.page_source for ele in errors)
+            if res:
+                return -1
+            elif "ERROR_SITEKEY" in driver.page_source:
+                return 0
+
         time.sleep(2)
         it += 1
     return -1

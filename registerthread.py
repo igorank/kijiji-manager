@@ -1,14 +1,12 @@
-import time
-
-import helper
 from proxy import Proxy
-from ipchanger import IPChanger
+import time
 import gsheet
+from ipchanger import IPChanger
 from e_mail import Email
 from kijiji import Kijiji
 from threading import *
 from wx.lib.pubsub import pub
-from kijiji_api import KijijiApi
+from kijiji_api import KijijiApi, KijijiApiException
 import wx
 import resultevent
 
@@ -69,6 +67,7 @@ class RegisterThread(Thread):
             wx.CallAfter(pub.sendMessage, "update", msg="")
 
             user_id, token = self.get_token(email_dict['email'], kijiji_dict['password'])
+            # user_id, token = self.k_api.login(email_dict['email'], kijiji_dict['password'])
             if self.want_abort:
                 wx.PostEvent(self._notify_window, ResultEvent(None))
                 return
@@ -105,14 +104,14 @@ class RegisterThread(Thread):
 
     def get_token(self, email, password):
         it = 0
-        while True:
+        while True:     #TEMP
             if it > 2:
                 IPChanger.change_ip(self.proxy.get_change_ip_url())  # меняем IP
                 it = 0
             try:
                 user_id, token = self.k_api.login(email, password)
                 break
-            except:
+            except KijijiApiException:
                 time.sleep(5)
                 it += 1
         return user_id, token

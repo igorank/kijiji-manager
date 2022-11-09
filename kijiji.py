@@ -58,8 +58,8 @@ class Kijiji(Driver):
                     return False
 
                 try:
-                    # WebDriverWait(driver, 20).until(
-                    #     EC.presence_of_element_located((By.XPATH, '//*[@id="profileName"]')))
+                    # WebDriverWait(driver, 15).until(
+                    #     lambda driver: driver.execute_script('return document.readyState') == 'complete')  #TEST
                     WebDriverWait(driver, 15).until(
                         EC.element_to_be_clickable((By.XPATH, '//*[@id="profileName"]')))
                     WebDriverWait(driver, 5).until(
