@@ -1,3 +1,4 @@
+from sys import platform
 import ctypes
 import wx
 from mainpanel import MainPanel
@@ -10,9 +11,10 @@ class MainFrame(wx.Frame):
         MainPanel(self)
 
         # Устанавливаем иконку
-        self.SetIcon(wx.Icon("icon.ico"))
-        myappid = 'mycompany.myproduct.subproduct.version'  # arbitrary string
-        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+        if platform == "win32":
+            self.SetIcon(wx.Icon("icon.ico"))
+            myappid = 'mycompany.myproduct.subproduct.version'  # arbitrary string
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 
 class GenApp(wx.App):
