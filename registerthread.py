@@ -67,7 +67,11 @@ class RegisterThread(Thread):
                 return
             wx.CallAfter(pub.sendMessage, "update", msg="")
 
-            user_id, token = self.get_token(email_dict['email'], kijiji_dict['password'])
+            try:
+                user_id, token = self.get_token(email_dict['email'], kijiji_dict['password'])
+            except ProxyException as pe:
+                wx.CallAfter(pub.sendMessage, "except", msg=str(pe))
+                return
             # user_id, token = self.k_api.login(email_dict['email'], kijiji_dict['password'])
             if self.want_abort:
                 wx.PostEvent(self._notify_window, ResultEvent(None))
@@ -114,15 +118,7 @@ class RegisterThread(Thread):
             except (KijijiApiException, ProxyError):
                 time.sleep(5)
                 it += 1
-        return False
-
-    def join(self, **kwargs):
-        Thread.join(self)
-        # Since join() returns in caller thread
-        # we re-raise the caught exception
-        # if any was caught
-        if self.exc:
-            raise self.exc
+        raise ProxyException("Proxy Error: Unable to get User ID and/or user token")
 
     def abort(self):
         """Abort thread."""

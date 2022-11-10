@@ -1,5 +1,4 @@
 import wx
-from proxy import ProxyException, Proxy
 import resultevent
 from helper import row_builder, show_message
 from registerthread import RegisterThread
@@ -65,6 +64,7 @@ class RegisterDialog(wx.Dialog):
         if self.count >= (int(self.num_profiles) * 100):
             self.Destroy()
             show_message(f"{self.num_profiles} profile(s) has/have been registered!", 'Success', wx.ICON_INFORMATION)
+            self.worker = None
 
         self.progress.SetValue(self.count)
 
@@ -85,20 +85,27 @@ class RegisterDialog(wx.Dialog):
             self.main_sizer.Add(self.status, 0, wx.CENTER, 5)
 
             # Запускаем поток регистрации
-            # Перехват исключения не работает из-за того что start() немедленно возвращает значение
+            # Перехват исключений для start() не работает из-за того что start() немедленно возвращает значение
             try:
                 self.worker = RegisterThread(self, self.config, self.num_profiles, self.proxy, self.main_sheet)
-                self.worker.daemon = True       #TEST
-                self.worker.start()
             except ValueError as exception:
                 show_message(str(exception), 'Error')
                 self.Destroy()
-                return
+                self.worker = None
+
+            self.worker.daemon = True  # TEST
+            self.worker.start()
+            pub.subscribe(self.except_hook, "except")    # функция для перехвата исключений в потоке
 
             self.progress.Show()
             self.progress.SetRange((int(self.num_profiles)) * 100)
             pub.subscribe(self.update_progress, "update")
             # self.main_sizer.Add(self.progress, 0, wx.CENTER, 5)
+
+    def except_hook(self, msg):
+        show_message(msg, 'Error')
+        self.Destroy()
+        self.worker = None
 
     def on_cancel(self, event):
         """Stop Computation."""
