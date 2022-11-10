@@ -1,4 +1,4 @@
-from proxy import Proxy
+from proxy import Proxy, ProxyException
 import time
 import gsheet
 from ipchanger import IPChanger
@@ -7,6 +7,7 @@ from kijiji import Kijiji
 from threading import *
 from wx.lib.pubsub import pub
 from kijiji_api import KijijiApi, KijijiApiException
+from python_socks._errors import ProxyError
 import wx
 import resultevent
 
@@ -104,17 +105,24 @@ class RegisterThread(Thread):
 
     def get_token(self, email, password):
         it = 0
-        while True:     #TEMP
-            if it > 2:
+        while it < 4:
+            if it == 2:
                 IPChanger.change_ip(self.proxy.get_change_ip_url())  # меняем IP
-                it = 0
             try:
                 user_id, token = self.k_api.login(email, password)
-                break
-            except KijijiApiException:
+                return user_id, token
+            except (KijijiApiException, ProxyError):
                 time.sleep(5)
                 it += 1
-        return user_id, token
+        return False
+
+    def join(self, **kwargs):
+        Thread.join(self)
+        # Since join() returns in caller thread
+        # we re-raise the caught exception
+        # if any was caught
+        if self.exc:
+            raise self.exc
 
     def abort(self):
         """Abort thread."""

@@ -10,7 +10,7 @@ from kijiji_api import KijijiApiException
 from httpcore import ReadTimeout
 
 
-def get_random_photos(path, num=1):  # 2 - коли
+def get_random_photos(path, num=1):  # 2 - количество
     files = []
     for x in os.listdir(path):
         if x.endswith(('.jpg', '.jpeg', '.png', '.PNG', '.gif', '.bmp')):
@@ -371,7 +371,7 @@ class PostAdDialog(wx.Dialog):
             try:
                 link = self.kijiji_api.upload_image(self.user_id, self.user_token, value)
             except ReadTimeout as read_timeout:
-                show_message(str(read_timeout) + "try again later.", 'Error')
+                show_message(str(read_timeout) + " Try again later.", 'Error')
                 return
 
             # Add a separate link for each image size

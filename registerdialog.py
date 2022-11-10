@@ -1,4 +1,5 @@
 import wx
+from proxy import ProxyException, Proxy
 import resultevent
 from helper import row_builder, show_message
 from registerthread import RegisterThread
@@ -84,8 +85,10 @@ class RegisterDialog(wx.Dialog):
             self.main_sizer.Add(self.status, 0, wx.CENTER, 5)
 
             # Запускаем поток регистрации
-            try:  # Перехват исключения не работает
+            # Перехват исключения не работает из-за того что start() немедленно возвращает значение
+            try:
                 self.worker = RegisterThread(self, self.config, self.num_profiles, self.proxy, self.main_sheet)
+                self.worker.daemon = True       #TEST
                 self.worker.start()
             except ValueError as exception:
                 show_message(str(exception), 'Error')

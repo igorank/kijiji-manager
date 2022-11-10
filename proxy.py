@@ -1,6 +1,10 @@
 # from singletonmeta import SingletonMeta
 
 
+class ProxyException(Exception):
+    """Proxy class exception"""
+
+
 # class Proxy(metaclass=SingletonMeta):
 class Proxy:
 
