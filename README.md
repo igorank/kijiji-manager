@@ -12,9 +12,92 @@
   </a>
 </p>
 
-> A manager that allows you to register and manage Kijiji accounts.
+> The project is a GUI application called "Kijiji Manager" that allows users to view and manage their advertisements on the Kijiji website. It provides functionalities such as retrieving user profiles, posting and deleting ads, and displaying details about ads. The application also utilizes features like proxy connections, email retrieval, and Google Sheets integration to streamline the advertising process. Overall, the project aims to simplify and automate the management of Kijiji advertisements, offering convenience and efficiency to users.
 
 ### 🏠 [Homepage](https://github.com/igorank/kijiji-manager#readme)
+
+## Screenshots
+
+![scr1](https://i.imgur.com/dpSuiRc.png)
+![scr2](https://i.imgur.com/mLpSrLc.png)
+![scr3](https://i.imgur.com/VJmQV6e.png)
+
+## Project Structure
+
+```
+repo
+├── README.md
+├── chromedriver.exe
+├── config.ini
+├── driver.py
+├── e_mail.py
+├── extensions
+│   └── 3.0.9_0.crx
+├── filemanager.py
+├── gsheet.py
+├── helper.py
+├── icon.ico
+├── image.py
+├── imapreader.py
+├── ipchanger.py
+├── kijiji-362509-c751d3f68ea1.json
+├── kijiji-manager.py
+├── kijiji.py
+├── kijiji_api.py
+├── mainpanel.py
+├── names
+│   ├── names.txt
+│   ├── names_eng.txt
+│   ├── second_surnames.txt
+│   ├── surnames.txt
+│   └── surnames_eng.txt
+├── ornate-bond-367318-e04beed43062.json
+├── photos
+├── postad.py
+├── proxy.py
+├── pyvenv.cfg
+├── rand_desc
+│   ├── description_1.txt
+│   ├── description_2.txt
+│   └── description_3.txt
+├── randdesc.py
+├── randomuserpass.py
+├── registerdialog.py
+├── registerthread.py
+├── requirements.txt
+├── resultevent.py
+├── singletonmeta.py
+├── tempmail.py
+├── tough-bindery-367409-ef2affab2dd3.json
+├── useragents
+│   ├── useragents_ios.txt
+│   ├── useragents_mac.txt
+│   ├── useragents_mobiles.txt
+│   ├── useragents_success.txt
+│   └── useragents_win.txt
+└── viewprofile.py
+
+7 directories, 60 files
+```
+
+## Installation
+Clone the kijiji-manager repository:
+```
+git clone https://github.com/igorank/kijiji-manager
+```
+Change to the project directory:
+```
+cd kijiji-manager
+```
+Install the dependencies:
+```
+pip install -r requirements.txt
+```
+
+## Using kijiji-manager
+```
+python main.py
+```
 
 ## Author
 
