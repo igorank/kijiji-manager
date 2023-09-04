@@ -96,7 +96,7 @@ pip install -r requirements.txt
 
 ## Using kijiji-manager
 ```
-python main.py
+python kijiji-manager.py 
 ```
 
 ## Author
